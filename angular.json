@@ -52,16 +52,28 @@
           },
           "defaultConfiguration": "production"
         },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "syneo-task-management-application:build:production"
+            },
+            "development": {
+              "buildTarget": "syneo-task-management-application:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
-             "options": {
-             "lintFilePatterns": [
-             "src/**/*.ts",
-             "src/**/*.html"
-                   ],
-              "force":true
-                  }
-            }
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ],
+            "force": true
+          }
+        }
       }
     }
   }
