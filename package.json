@@ -1,13 +1,16 @@
 {
   "name": "syneo-task-management-application",
   "version": "0.0.0",
-  "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test"
-  },
+  
+    "scripts": {
+      "prebuild": "npm run format",
+      "start": "ng serve",
+      "build": "ng build",
+      "watch": "ng build --watch --configuration development",
+      "test": "ng test",
+      "lint": "ng lint",
+      "format": "prettier --write \"src/**/*.{ts,html,css}\""
+      },
   "private": true,
   "dependencies": {
     "@angular/animations": "^17.3.0",
@@ -24,15 +27,28 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^17.3.13",
+    "@angular-eslint/builder": "^17.5.3",
+    "@angular-eslint/eslint-plugin": "^17.5.3",
+    "@angular-eslint/eslint-plugin-template": "^17.5.3",
+    "@angular-eslint/schematics": "17.5.3",
+    "@angular-eslint/template-parser": "^17.5.3",
     "@angular/cli": "^17.3.13",
     "@angular/compiler-cli": "^17.3.0",
+    "@eslint/js": "^9.23.0",
     "@types/jasmine": "~5.1.0",
+    "@typescript-eslint/eslint-plugin": "^8.28.0",
+    "@typescript-eslint/parser": "^8.28.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^8.10.0",
+    "eslint-plugin-prettier": "^5.1.3",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.4.2"
+    "prettier": "^3.2.5",
+    "typescript": "~5.4.2",
+    "typescript-eslint": "^8.28.0"
   }
 }
