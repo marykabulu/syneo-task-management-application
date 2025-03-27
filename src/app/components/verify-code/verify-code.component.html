@@ -1,0 +1,38 @@
+<div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <app-logo></app-logo>
+        <h1>Verify Code</h1>
+        <p>Enter the verification code sent to your email</p>
+      </div>
+  
+      <form [formGroup]="verifyCodeForm" (ngSubmit)="onSubmit()" class="auth-form">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" placeholder="name@example.com" type="email" required>
+          <mat-error *ngIf="verifyCodeForm.get('email')?.hasError('required')">Email is required</mat-error>
+          <mat-error *ngIf="verifyCodeForm.get('email')?.hasError('email')">Please enter a valid email</mat-error>
+        </mat-form-field>
+  
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Verification Code</mat-label>
+          <input matInput formControlName="code" placeholder="123456" required>
+          <mat-error *ngIf="verifyCodeForm.get('code')?.hasError('required')">Verification code is required</mat-error>
+          <mat-error *ngIf="verifyCodeForm.get('code')?.hasError('minlength') || verifyCodeForm.get('code')?.hasError('maxlength')">
+            Code must be 6 digits
+          </mat-error>
+        </mat-form-field>
+  
+        <button mat-raised-button color="primary" type="submit" class="submit-button" [disabled]="verifyCodeForm.invalid || (isLoading$ | async)">
+          <mat-spinner *ngIf="isLoading$ | async" diameter="20" class="spinner"></mat-spinner>
+          <span *ngIf="!(isLoading$ | async)">Verify Code</span>
+        </button>
+  
+        <div class="auth-footer">
+          <p>Didn't receive a code? <a routerLink="/forgot-password">Resend code</a></p>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  

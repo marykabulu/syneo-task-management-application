@@ -1,0 +1,39 @@
+<div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <app-logo></app-logo>
+        <h1>Welcome back</h1>
+        <p>Enter your credentials to sign in to your account</p>
+      </div>
+  
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" placeholder="name@example.com" type="email" required>
+          <mat-error *ngIf="loginForm.get('email')?.hasError('required')">Email is required</mat-error>
+          <mat-error *ngIf="loginForm.get('email')?.hasError('email')">Please enter a valid email</mat-error>
+        </mat-form-field>
+  
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Password</mat-label>
+          <input matInput formControlName="password" type="password" required>
+          <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Password is required</mat-error>
+        </mat-form-field>
+  
+        <div class="forgot-password">
+          <a routerLink="/forgot-password">Forgot password?</a>
+        </div>
+  
+        <button mat-raised-button color="primary" type="submit" class="submit-button" [disabled]="loginForm.invalid || (isLoading$ | async)">
+          <mat-spinner *ngIf="isLoading$ | async" diameter="20" class="spinner"></mat-spinner>
+          <span *ngIf="!(isLoading$ | async)">Sign in</span>
+        </button>
+  
+        <div class="auth-footer">
+          <p>Don't have an account? <a routerLink="/register">Sign up</a></p>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  
