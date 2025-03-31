@@ -1,62 +1,69 @@
-import { Component, type OnInit } from "@angular/core"
-import { type FormBuilder, type FormGroup, Validators } from "@angular/forms"
-import type { Router } from "@angular/router"
-import type { MatSnackBar } from "@angular/material/snack-bar"
-import type { AuthService } from "../../services/auth.service"
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatIconModule } from '@angular/material/icon';
+import { AuthService } from '../../services/auth.service';
+import { LogoComponent } from '../logo/logo.component';
 
 @Component({
-  selector: "app-reset-password",
-  templateUrl: "./reset-password.component.html",
-  styleUrls: ["./reset-password.component.css"],
+  selector: 'app-reset-password',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatProgressSpinnerModule,
+    MatIconModule,
+    LogoComponent
+  ],
+  templateUrl: './reset-password.component.html',
+  styleUrls: ['./reset-password.component.css']
 })
 export class ResetPasswordComponent implements OnInit {
-  resetPasswordForm!: FormGroup
-  isLoading$ = this.authService.isLoading$
+  resetPasswordForm: FormGroup;
+  hidePassword = true;
+  hideConfirmPassword = true;
 
   constructor(
-    private formBuilder: FormBuilder,
-    private authService: AuthService,
+    private fb: FormBuilder,
     private router: Router,
-    private snackBar: MatSnackBar,
-  ) {}
-
-  ngOnInit(): void {
-    this.resetPasswordForm = this.formBuilder.group(
-      {
-        email: ["", [Validators.required, Validators.email]],
-        password: ["", [Validators.required, Validators.minLength(6)]],
-        confirmPassword: ["", Validators.required],
-      },
-      { validator: this.passwordMatchValidator },
-    )
+    public authService: AuthService
+  ) {
+    this.resetPasswordForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      code: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      confirmPassword: ['', [Validators.required]]
+    }, { validator: this.passwordMatchValidator });
   }
 
+  ngOnInit(): void {}
+
   passwordMatchValidator(g: FormGroup) {
-    const password = g.get("password")?.value
-    const confirmPassword = g.get("confirmPassword")?.value
-    return password === confirmPassword ? null : { mismatch: true }
+    return g.get('password')?.value === g.get('confirmPassword')?.value
+      ? null
+      : { mismatch: true };
   }
 
   onSubmit(): void {
-    if (this.resetPasswordForm.invalid) {
-      return
+    if (this.resetPasswordForm.valid) {
+      const { email, code, password } = this.resetPasswordForm.value;
+      this.authService.resetPassword(email, code, password).subscribe({
+        next: () => {
+          this.router.navigate(['/login']);
+        },
+        error: (error) => {
+          console.error('Error resetting password:', error);
+        }
+      });
     }
-
-    const { email, password } = this.resetPasswordForm.value
-
-    this.authService.resetPassword(email, password).subscribe({
-      next: () => {
-        this.snackBar.open("Your password has been reset successfully", "Close", {
-          duration: 3000,
-        })
-        this.router.navigate(["/"])
-      },
-      error: (error) => {
-        this.snackBar.open(error.message || "Password reset failed", "Close", {
-          duration: 3000,
-        })
-      },
-    })
   }
 }
 

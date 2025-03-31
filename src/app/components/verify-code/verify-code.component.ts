@@ -1,52 +1,64 @@
-import { Component, type OnInit } from "@angular/core"
-import { type FormBuilder, type FormGroup, Validators } from "@angular/forms"
-import type { Router } from "@angular/router"
-import type { MatSnackBar } from "@angular/material/snack-bar"
-import type { AuthService } from "../../services/auth.service"
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { AuthService } from '../../services/auth.service';
+import { LogoComponent } from '../logo/logo.component';
 
 @Component({
-  selector: "app-verify-code",
-  templateUrl: "./verify-code.component.html",
-  styleUrls: ["./verify-code.component.css"],
+  selector: 'app-verify-code',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    MatButtonModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
+    LogoComponent
+  ],
+  templateUrl: './verify-code.component.html',
+  styleUrls: ['./verify-code.component.css']
 })
 export class VerifyCodeComponent implements OnInit {
-  verifyCodeForm!: FormGroup
-  isLoading$ = this.authService.isLoading$
+  verifyCodeForm: FormGroup;
 
   constructor(
-    private formBuilder: FormBuilder,
-    private authService: AuthService,
-    private router: Router,
-    private snackBar: MatSnackBar,
-  ) {}
-
-  ngOnInit(): void {
-    this.verifyCodeForm = this.formBuilder.group({
-      email: ["", [Validators.required, Validators.email]],
-      code: ["", [Validators.required, Validators.minLength(6), Validators.maxLength(6)]],
-    })
+    private fb: FormBuilder,
+    public authService: AuthService,
+    private router: Router
+  ) {
+    this.verifyCodeForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      code: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]]
+    });
   }
 
+  ngOnInit(): void {}
+
   onSubmit(): void {
-    if (this.verifyCodeForm.invalid) {
-      return
+    if (this.verifyCodeForm.valid) {
+      const { email, code } = this.verifyCodeForm.value;
+      this.authService.verifyCode(email, code).subscribe({
+        next: () => {
+          this.router.navigate(['/reset-password']);
+        },
+        error: (error) => {
+          console.error('Verify code error:', error);
+        }
+      });
     }
-
-    const { email, code } = this.verifyCodeForm.value
-
-    this.authService.verifyCode(email, code).subscribe({
-      next: () => {
-        this.snackBar.open("Code verified successfully", "Close", {
-          duration: 3000,
-        })
-        this.router.navigate(["/reset-password"])
-      },
-      error: (error) => {
-        this.snackBar.open(error.message || "Verification failed", "Close", {
-          duration: 3000,
-        })
-      },
-    })
   }
 }
 

@@ -1,210 +1,104 @@
-import { Injectable } from "@angular/core"
-import { BehaviorSubject, type Observable, of } from "rxjs"
-import { delay, tap } from "rxjs/operators"
-import type { MatSnackBar } from "@angular/material/snack-bar"
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { tap, finalize, catchError } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 export interface User {
-  id: string
-  name: string
-  email: string
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
 }
 
-interface UserData {
-  id: string
-  name: string
-  email: string
-  password: string
+export interface AuthResponse {
+  user: User;
+  token: string;
 }
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root'
 })
 export class AuthService {
-  // Dummy user data for testing
-  private DUMMY_USERS: UserData[] = [
-    {
-      id: "1",
-      name: "John Doe",
-      email: "john@example.com",
-      password: "password123",
-    },
-    {
-      id: "2",
-      name: "Jane Smith",
-      email: "jane@example.com",
-      password: "password456",
-    },
-  ]
+  private apiUrl = environment.apiUrl;
+  private currentUserSubject: BehaviorSubject<User | null>;
+  private isLoadingSubject = new BehaviorSubject<boolean>(false);
 
-  // Dummy verification codes
-  private VERIFICATION_CODES: Record<string, string> = {}
+  public currentUser$: Observable<User | null>;
+  public isLoading$: Observable<boolean> = this.isLoadingSubject.asObservable();
 
-  private currentUserSubject = new BehaviorSubject<User | null>(null)
-  public currentUser$ = this.currentUserSubject.asObservable()
-
-  private isLoadingSubject = new BehaviorSubject<boolean>(false)
-  public isLoading$ = this.isLoadingSubject.asObservable()
-
-  constructor(private snackBar: MatSnackBar) {
-    // Check for stored user on initialization
-    const storedUser = localStorage.getItem("auth_user")
-    if (storedUser) {
-      try {
-        this.currentUserSubject.next(JSON.parse(storedUser))
-      } catch (error) {
-        console.error("Failed to parse stored user", error)
-      }
-    }
+  constructor(private http: HttpClient) {
+    const token = localStorage.getItem('token');
+    this.currentUserSubject = new BehaviorSubject<User | null>(token ? this.getUserFromToken(token) : null);
+    this.currentUser$ = this.currentUserSubject.asObservable();
   }
 
-  get currentUser(): User | null {
-    return this.currentUserSubject.value
+  private loadCurrentUser(): Observable<User> {
+    this.isLoadingSubject.next(true);
+    return this.http.get<User>(`${this.apiUrl}/auth/me`).pipe(
+      tap(user => this.currentUserSubject.next(user)),
+      catchError(() => {
+        this.logout();
+        return of();
+      }),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
   }
 
-  login(email: string, password: string): Observable<boolean> {
-    this.isLoadingSubject.next(true)
-
-    // Simulate API call delay
-    return of(true).pipe(
-      delay(1000),
-      tap(() => {
-        const foundUser = this.DUMMY_USERS.find((u) => u.email === email && u.password === password)
-
-        if (foundUser) {
-          const { password: _, ...userWithoutPassword } = foundUser
-          this.currentUserSubject.next(userWithoutPassword)
-          localStorage.setItem("auth_user", JSON.stringify(userWithoutPassword))
-          return true
-        }
-
-        throw new Error("Invalid email or password")
-      }),
-      tap({
-        error: () => this.isLoadingSubject.next(false),
-        complete: () => this.isLoadingSubject.next(false),
-      }),
-    )
+  isAuthenticated(): boolean {
+    return !!localStorage.getItem('token');
   }
 
-  register(name: string, email: string, password: string): Observable<boolean> {
-    this.isLoadingSubject.next(true)
-
-    // Simulate API call delay
-    return of(true).pipe(
-      delay(1000),
-      tap(() => {
-        // Check if user already exists
-        if (this.DUMMY_USERS.some((u) => u.email === email)) {
-          throw new Error("Email already in use")
-        }
-
-        // Create new user
-        const newUser = {
-          id: String(this.DUMMY_USERS.length + 1),
-          name,
-          email,
-          password,
-        }
-
-        // Add to dummy database
-        this.DUMMY_USERS.push(newUser)
-
-        // Log in the new user
-        const { password: _, ...userWithoutPassword } = newUser
-        this.currentUserSubject.next(userWithoutPassword)
-        localStorage.setItem("auth_user", JSON.stringify(userWithoutPassword))
-
-        return true
+  login(email: string, password: string): Observable<AuthResponse> {
+    this.isLoadingSubject.next(true);
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, { email, password }).pipe(
+      tap(response => {
+        localStorage.setItem('token', response.token);
+        this.currentUserSubject.next(response.user);
       }),
-      tap({
-        error: () => this.isLoadingSubject.next(false),
-        complete: () => this.isLoadingSubject.next(false),
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  register(name: string, email: string, password: string): Observable<AuthResponse> {
+    this.isLoadingSubject.next(true);
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, { name, email, password }).pipe(
+      tap(response => {
+        localStorage.setItem('token', response.token);
+        this.currentUserSubject.next(response.user);
       }),
-    )
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  forgotPassword(email: string): Observable<void> {
+    this.isLoadingSubject.next(true);
+    return this.http.post<void>(`${this.apiUrl}/auth/forgot-password`, { email }).pipe(
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  verifyCode(email: string, code: string): Observable<void> {
+    this.isLoadingSubject.next(true);
+    return this.http.post<void>(`${this.apiUrl}/auth/verify-code`, { email, code }).pipe(
+      finalize(() => this.isLoadingSubject.next(false))
+    );
+  }
+
+  resetPassword(email: string, code: string, password: string): Observable<void> {
+    this.isLoadingSubject.next(true);
+    return this.http.post<void>(`${this.apiUrl}/auth/reset-password`, { email, code, password }).pipe(
+      finalize(() => this.isLoadingSubject.next(false))
+    );
   }
 
   logout(): void {
-    this.currentUserSubject.next(null)
-    localStorage.removeItem("auth_user")
+    localStorage.removeItem('token');
+    this.currentUserSubject.next(null);
   }
 
-  requestPasswordReset(email: string): Observable<string> {
-    this.isLoadingSubject.next(true)
-
-    // Simulate API call delay
-    return of(email).pipe(
-      delay(1000),
-      tap(() => {
-        // Check if user exists
-        const userExists = this.DUMMY_USERS.some((u) => u.email === email)
-
-        if (!userExists) {
-          throw new Error("Email not found")
-        }
-
-        // Generate a verification code
-        const code = Math.floor(100000 + Math.random() * 900000).toString()
-        this.VERIFICATION_CODES[email] = code
-
-        // In a real app, this would send an email
-        this.snackBar.open(`Your verification code is: ${code}`, "Close", {
-          duration: 10000,
-        })
-
-        return email
-      }),
-      tap({
-        error: () => this.isLoadingSubject.next(false),
-        complete: () => this.isLoadingSubject.next(false),
-      }),
-    )
+  private getUserFromToken(token: string): User | null {
+    // Implement the logic to parse the token and return the user object
+    return null; // Placeholder return, actual implementation needed
   }
-
-  verifyCode(email: string, code: string): Observable<boolean> {
-    this.isLoadingSubject.next(true)
-
-    // Simulate API call delay
-    return of(true).pipe(
-      delay(1000),
-      tap(() => {
-        if (this.VERIFICATION_CODES[email] !== code) {
-          throw new Error("Invalid code")
-        }
-        return true
-      }),
-      tap({
-        error: () => this.isLoadingSubject.next(false),
-        complete: () => this.isLoadingSubject.next(false),
-      }),
-    )
-  }
-
-  resetPassword(email: string, password: string): Observable<boolean> {
-    this.isLoadingSubject.next(true)
-
-    // Simulate API call delay
-    return of(true).pipe(
-      delay(1000),
-      tap(() => {
-        const userIndex = this.DUMMY_USERS.findIndex((u) => u.email === email)
-
-        if (userIndex === -1) {
-          throw new Error("Email not found")
-        }
-
-        // Update password
-        this.DUMMY_USERS[userIndex].password = password
-
-        // Clear verification code
-        delete this.VERIFICATION_CODES[email]
-
-        return true
-      }),
-      tap({
-        error: () => this.isLoadingSubject.next(false),
-        complete: () => this.isLoadingSubject.next(false),
-      }),
-    )
-  }
-}
-
+} 

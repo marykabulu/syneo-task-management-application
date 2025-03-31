@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter, forwardRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 /**
@@ -13,7 +14,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 @Component({
   selector: 'app-input',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -34,8 +35,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
         [type]="type"
         [placeholder]="placeholder"
         [disabled]="disabled"
-        [value]="value"
-        (input)="onInputChange($event)"
+        [ngModel]="value"
+        (ngModelChange)="onValueChange($event)"
         (focus)="onFocus.emit($event)"
         (blur)="onTouched(); onBlur.emit($event)"
       >
@@ -146,9 +147,9 @@ export class InputComponent implements ControlValueAccessor {
    * Handles input changes and emits the new value
    * @param event - The input event
    */
-  onInputChange(event: Event): void {
-    const value = (event.target as HTMLInputElement).value;
+  onValueChange(value: string): void {
     this.value = value;
+    this.valueChange.emit(value);
     this.onChange(value);
   }
 

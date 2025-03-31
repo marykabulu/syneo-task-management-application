@@ -93,8 +93,8 @@ import { AlertComponent } from '../../shared/components/ui/alert/alert.component
           <div class="form-group">
             <app-checkbox
               [(checked)]="rememberMe"
-              (onChange)="clearError()">
-              Remember me
+              label="Remember me"
+              (checkedChange)="onRememberMeChange($event)">
             </app-checkbox>
           </div>
 
@@ -273,9 +273,21 @@ export class LoginPageComponent implements OnInit, AfterViewInit {
     });
   }
 
-  ngOnInit() {}
+  ngOnInit(): void {
+    // Check if there are saved credentials
+    const savedEmail = localStorage.getItem('rememberedEmail');
+    const savedPassword = localStorage.getItem('rememberedPassword');
+    
+    if (savedEmail && savedPassword) {
+      this.rememberMe = true;
+      this.loginForm.patchValue({
+        email: savedEmail,
+        password: savedPassword
+      });
+    }
+  }
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     // Initialize form state after view is ready
     setTimeout(() => {
       this.isFormInitialized = true;
@@ -317,7 +329,7 @@ export class LoginPageComponent implements OnInit, AfterViewInit {
    * Handles form submission
    * Validates the form and processes login if valid
    */
-  onSubmit() {
+  onSubmit(): void {
     if (this.loginForm.invalid) {
       // Mark all fields as touched to show validation errors
       Object.keys(this.loginForm.controls).forEach(key => {
@@ -327,46 +339,58 @@ export class LoginPageComponent implements OnInit, AfterViewInit {
     }
 
     this.isLoading = true;
-    const email = this.loginForm.value.email;
-    const password = this.loginForm.value.password;
+    this.errorMessage = '';
 
-    // Simulate API call with timeout
+    const { email, password } = this.loginForm.value;
+
+    // TODO: Implement actual login logic with your backend
+    // For now, just simulate an API call
     setTimeout(() => {
-      if (email === 'test@example.com' && password === 'password') {
-        this.toastService.success('Logged in successfully!');
-        this.router.navigate(['/dashboard']);
-      } else {
-        this.toastService.error('Invalid email or password');
-      }
       this.isLoading = false;
-    }, 1000);
+      this.toastService.success('Login successful!');
+      this.router.navigate(['/dashboard']);
+    }, 1500);
   }
 
   /**
    * Navigates to the registration page
    */
-  navigateToRegister() {
+  navigateToRegister(): void {
     this.router.navigate(['/register']);
   }
 
   /**
    * Navigates to the forgot password page
    */
-  navigateToForgotPassword() {
+  navigateToForgotPassword(): void {
     this.router.navigate(['/forgot-password']);
   }
 
   /**
    * Toggles password visibility
    */
-  togglePasswordVisibility() {
+  togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
 
   /**
    * Clears the general error message
    */
-  clearError() {
+  clearError(): void {
     this.errorMessage = '';
+  }
+
+  onRememberMeChange(checked: boolean): void {
+    this.rememberMe = checked;
+    if (checked) {
+      // Save credentials to localStorage
+      const { email, password } = this.loginForm.value;
+      localStorage.setItem('rememberedEmail', email);
+      localStorage.setItem('rememberedPassword', password);
+    } else {
+      // Remove saved credentials
+      localStorage.removeItem('rememberedEmail');
+      localStorage.removeItem('rememberedPassword');
+    }
   }
 } 

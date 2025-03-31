@@ -1,63 +1,76 @@
-import { Component, type OnInit } from "@angular/core"
-import { type FormBuilder, type FormGroup, Validators } from "@angular/forms"
-import type { Router } from "@angular/router"
-import type { MatSnackBar } from "@angular/material/snack-bar"
-import type { AuthService } from "../../services/auth.service"
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { AuthService } from '../../services/auth.service';
+import { LogoComponent } from '../logo/logo.component';
 
 @Component({
-  selector: "app-register",
-  templateUrl: "./register.component.html",
-  styleUrls: ["./register.component.css"],
+  selector: 'app-register',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    MatButtonModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
+    LogoComponent
+  ],
+  templateUrl: './register.component.html',
+  styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit {
-  registerForm!: FormGroup
-  isLoading$ = this.authService.isLoading$
+  registerForm: FormGroup;
+  hidePassword = true;
+  hideConfirmPassword = true;
 
   constructor(
-    private formBuilder: FormBuilder,
-    private authService: AuthService,
-    private router: Router,
-    private snackBar: MatSnackBar,
-  ) {}
-
-  ngOnInit(): void {
-    this.registerForm = this.formBuilder.group(
-      {
-        name: ["", Validators.required],
-        email: ["", [Validators.required, Validators.email]],
-        password: ["", [Validators.required, Validators.minLength(6)]],
-        confirmPassword: ["", Validators.required],
-      },
-      { validator: this.passwordMatchValidator },
-    )
+    private fb: FormBuilder,
+    public authService: AuthService,
+    private router: Router
+  ) {
+    this.registerForm = this.fb.group({
+      firstName: ['', [Validators.required]],
+      lastName: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required]]
+    }, { validator: this.passwordMatchValidator });
   }
 
+  ngOnInit(): void {}
+
   passwordMatchValidator(g: FormGroup) {
-    const password = g.get("password")?.value
-    const confirmPassword = g.get("confirmPassword")?.value
-    return password === confirmPassword ? null : { mismatch: true }
+    return g.get('password')?.value === g.get('confirmPassword')?.value
+      ? null
+      : { mismatch: true };
   }
 
   onSubmit(): void {
-    if (this.registerForm.invalid) {
-      return
+    if (this.registerForm.valid) {
+      const { firstName, lastName, email, password, confirmPassword } = this.registerForm.value;
+      const name = `${firstName} ${lastName}`;
+      this.authService.register(name, email, password).subscribe({
+        next: () => {
+          this.router.navigate(['/login']);
+        },
+        error: (error) => {
+          console.error('Registration error:', error);
+        }
+      });
     }
-
-    const { name, email, password } = this.registerForm.value
-
-    this.authService.register(name, email, password).subscribe({
-      next: () => {
-        this.snackBar.open("Your account has been created successfully", "Close", {
-          duration: 3000,
-        })
-        this.router.navigate(["/dashboard"])
-      },
-      error: (error) => {
-        this.snackBar.open(error.message || "Registration failed", "Close", {
-          duration: 3000,
-        })
-      },
-    })
   }
 }
 

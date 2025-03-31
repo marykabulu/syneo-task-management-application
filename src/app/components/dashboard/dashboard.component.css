@@ -1,62 +1,105 @@
 .dashboard-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 1rem;
-  }
-  
-  .dashboard-card {
-    width: 100%;
-    max-width: 500px;
-    padding: 2rem;
-  }
-  
-  .dashboard-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 2rem;
-    text-align: center;
-  }
-  
-  .dashboard-header h1 {
-    margin: 1rem 0 0.5rem;
-    font-size: 1.5rem;
-    font-weight: 600;
-  }
-  
-  .dashboard-header p {
-    color: rgba(0, 0, 0, 0.6);
-    margin: 0;
-  }
-  
-  .profile-card {
-    width: 100%;
-    margin-bottom: 1rem;
-  }
-  
-  .profile-info {
-    margin: 1rem 0;
-  }
-  
-  .info-item {
-    margin-bottom: 1rem;
-  }
-  
-  .info-label {
-    font-size: 0.875rem;
-    font-weight: 500;
-    margin-bottom: 0.25rem;
-  }
-  
-  .info-value {
-    color: rgba(0, 0, 0, 0.6);
-    margin: 0;
-  }
-  
-  .logout-button {
-    width: 100%;
-  }
-  
-  
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  background-color: white;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.dashboard-content {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.welcome-section {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.welcome-section h2 {
+  margin: 0 0 1rem;
+  color: #333;
+}
+
+.welcome-section p {
+  margin: 0;
+  color: #666;
+}
+
+.task-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  position: relative;
+}
+
+.task-list mat-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+.task-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.task-card mat-card-header {
+  margin-bottom: 16px;
+}
+
+.task-card mat-card-title {
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+}
+
+.task-card mat-card-subtitle {
+  color: #666;
+}
+
+.task-card mat-card-content {
+  flex-grow: 1;
+}
+
+.task-card p {
+  margin: 0 0 16px 0;
+  color: #666;
+}
+
+.task-card mat-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px;
+  margin-top: auto;
+}
+
+mat-chip-list {
+  margin-top: 8px;
+}
+
+mat-chip {
+  margin-right: 8px;
+} 

@@ -35,80 +35,82 @@ import { ToastService } from '../shared/components/ui/toast/toast.service';
           <p>Please fill in your details to register</p>
         </div>
 
-        <div class="form-group">
-          <app-input
-            type="text"
-            placeholder="Enter your name"
-            [(value)]="name"
-            (onChange)="clearError()">
-          </app-input>
-        </div>
-
-        <div class="form-group">
-          <app-input
-            type="email"
-            placeholder="Enter your email"
-            [(value)]="email"
-            (onChange)="clearError()">
-          </app-input>
-        </div>
-
-        <div class="form-group">
-          <div class="password-input">
+        <form (ngSubmit)="onSubmit()">
+          <div class="form-group">
             <app-input
-              [type]="showPassword ? 'text' : 'password'"
-              placeholder="Enter your password"
-              [(value)]="password"
+              type="text"
+              placeholder="Enter your name"
+              [(value)]="name"
               (onChange)="clearError()">
             </app-input>
-            <button 
-              type="button" 
-              class="toggle-password" 
-              (click)="togglePasswordVisibility()">
-              {{ showPassword ? 'Hide' : 'Show' }}
-            </button>
           </div>
-        </div>
 
-        <div class="form-group">
-          <div class="password-input">
+          <div class="form-group">
             <app-input
-              [type]="showConfirmPassword ? 'text' : 'password'"
-              placeholder="Confirm your password"
-              [(value)]="confirmPassword"
+              type="email"
+              placeholder="Enter your email"
+              [(value)]="email"
               (onChange)="clearError()">
             </app-input>
-            <button 
-              type="button" 
-              class="toggle-password" 
-              (click)="toggleConfirmPasswordVisibility()">
-              {{ showConfirmPassword ? 'Hide' : 'Show' }}
-            </button>
           </div>
-        </div>
 
-        <div class="form-group">
-          <app-checkbox
-            [(checked)]="acceptTerms"
-            (onChange)="clearError()">
-            I accept the Terms of use and Privacy Policy
-          </app-checkbox>
-        </div>
+          <div class="form-group">
+            <div class="password-input">
+              <app-input
+                [type]="showPassword ? 'text' : 'password'"
+                placeholder="Enter your password"
+                [(value)]="password"
+                (onChange)="clearError()">
+              </app-input>
+              <button 
+                type="button" 
+                class="toggle-password" 
+                (click)="togglePasswordVisibility()">
+                {{ showPassword ? 'Hide' : 'Show' }}
+              </button>
+            </div>
+          </div>
 
-        <app-alert
-          *ngIf="errorMessage"
-          variant="error"
-          [showIcon]="true">
-          {{ errorMessage }}
-        </app-alert>
+          <div class="form-group">
+            <div class="password-input">
+              <app-input
+                [type]="showConfirmPassword ? 'text' : 'password'"
+                placeholder="Confirm your password"
+                [(value)]="confirmPassword"
+                (onChange)="clearError()">
+              </app-input>
+              <button 
+                type="button" 
+                class="toggle-password" 
+                (click)="toggleConfirmPasswordVisibility()">
+                {{ showConfirmPassword ? 'Hide' : 'Show' }}
+              </button>
+            </div>
+          </div>
 
-        <app-button
-          (onClick)="onSubmit()"
-          variant="primary"
-          class="register-btn"
-          [disabled]="isLoading">
-          {{ isLoading ? 'Creating account...' : 'Create account' }}
-        </app-button>
+          <div class="form-group">
+            <app-checkbox
+              [(checked)]="acceptTerms"
+              label="I accept the Terms of use and Privacy Policy"
+              (onChange)="clearError()">
+            </app-checkbox>
+          </div>
+
+          <app-alert
+            *ngIf="errorMessage"
+            variant="error"
+            [showIcon]="true">
+            {{ errorMessage }}
+          </app-alert>
+
+          <app-button
+            type="submit"
+            variant="primary"
+            class="register-btn"
+            [disabled]="isLoading">
+            {{ isLoading ? 'Creating account...' : 'Create account' }}
+          </app-button>
+        </form>
 
         <p class="login-link">
           Already have an account? 
@@ -230,8 +232,39 @@ export class RegistrationPageComponent {
   ) {}
 
   onSubmit() {
-    if (!this.name || !this.email || !this.password || !this.confirmPassword) {
-      this.errorMessage = 'Please fill in all fields';
+    // Clear any previous errors
+    this.errorMessage = '';
+
+    // Validate all fields
+    if (!this.name.trim()) {
+      this.errorMessage = 'Please enter your name';
+      return;
+    }
+
+    if (!this.email.trim()) {
+      this.errorMessage = 'Please enter your email';
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.email)) {
+      this.errorMessage = 'Please enter a valid email address';
+      return;
+    }
+
+    if (!this.password) {
+      this.errorMessage = 'Please enter a password';
+      return;
+    }
+
+    if (this.password.length < 6) {
+      this.errorMessage = 'Password must be at least 6 characters long';
+      return;
+    }
+
+    if (!this.confirmPassword) {
+      this.errorMessage = 'Please confirm your password';
       return;
     }
 
@@ -245,8 +278,8 @@ export class RegistrationPageComponent {
       return;
     }
 
+    // If all validations pass, proceed with registration
     this.isLoading = true;
-    this.errorMessage = '';
 
     // TODO: Implement actual registration logic with your backend
     // For now, just simulate an API call

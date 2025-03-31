@@ -33,7 +33,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
           [disabled]="disabled"
           (change)="onChange($event)"
           (blur)="onBlur()"
-        >
+        > 
       </div>
       <!-- Label text -->
       <span class="checkbox-label" *ngIf="label">{{ label }}</span>

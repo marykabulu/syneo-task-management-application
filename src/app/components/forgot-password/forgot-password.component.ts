@@ -1,51 +1,62 @@
-import { Component, type OnInit } from "@angular/core"
-import { type FormBuilder, type FormGroup, Validators } from "@angular/forms"
-import type { Router } from "@angular/router"
-import type { MatSnackBar } from "@angular/material/snack-bar"
-import type { AuthService } from "../../services/auth.service"
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { AuthService } from '../../services/auth.service';
+import { LogoComponent } from '../logo/logo.component';
 
 @Component({
-  selector: "app-forgot-password",
-  templateUrl: "./forgot-password.component.html",
-  styleUrls: ["./forgot-password.component.css"],
+  selector: 'app-forgot-password',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    MatButtonModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
+    LogoComponent
+  ],
+  templateUrl: './forgot-password.component.html',
+  styleUrls: ['./forgot-password.component.css']
 })
 export class ForgotPasswordComponent implements OnInit {
-  forgotPasswordForm!: FormGroup
-  isLoading$ = this.authService.isLoading$
+  forgotPasswordForm: FormGroup;
 
   constructor(
-    private formBuilder: FormBuilder,
-    private authService: AuthService,
-    private router: Router,
-    private snackBar: MatSnackBar,
-  ) {}
-
-  ngOnInit(): void {
-    this.forgotPasswordForm = this.formBuilder.group({
-      email: ["", [Validators.required, Validators.email]],
-    })
+    private fb: FormBuilder,
+    public authService: AuthService,
+    private router: Router
+  ) {
+    this.forgotPasswordForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]]
+    });
   }
 
+  ngOnInit(): void {}
+
   onSubmit(): void {
-    if (this.forgotPasswordForm.invalid) {
-      return
+    if (this.forgotPasswordForm.valid) {
+      this.authService.forgotPassword(this.forgotPasswordForm.value.email).subscribe({
+        next: () => {
+          this.router.navigate(['/verify-code']);
+        },
+        error: (error) => {
+          console.error('Forgot password error:', error);
+        }
+      });
     }
-
-    const { email } = this.forgotPasswordForm.value
-
-    this.authService.requestPasswordReset(email).subscribe({
-      next: () => {
-        this.snackBar.open("A verification code has been sent to your email", "Close", {
-          duration: 3000,
-        })
-        this.router.navigate(["/verify-code"])
-      },
-      error: (error) => {
-        this.snackBar.open(error.message || "Request failed", "Close", {
-          duration: 3000,
-        })
-      },
-    })
   }
 }
 
