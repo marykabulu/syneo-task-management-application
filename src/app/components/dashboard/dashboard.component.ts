@@ -1,3 +1,7 @@
+/**
+ * Component responsible for displaying and managing tasks in the application.
+ * Provides functionality to view, create, edit, and delete tasks.
+ */
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -29,6 +33,7 @@ import { Task } from '../../models/task.model';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
+  // Array to store all tasks
   tasks: Task[] = [];
 
   constructor(
@@ -37,9 +42,14 @@ export class DashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // Load tasks when component initializes
     this.loadTasks();
   }
 
+  /**
+   * Loads all tasks from the task service
+   * Updates the tasks array with the fetched data
+   */
   loadTasks(): void {
     this.taskService.getTasks().subscribe({
       next: (tasks) => {
@@ -51,6 +61,10 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  /**
+   * Opens the task dialog for creating or editing a task
+   * @param task The task to edit, or null for creating a new task
+   */
   openTaskDialog(task: Task | null): void {
     const dialogRef = this.dialog.open(TaskDialogComponent, {
       width: '500px',
@@ -68,6 +82,10 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  /**
+   * Creates a new task using the task service
+   * @param task The task data to create
+   */
   createTask(task: Task): void {
     this.taskService.createTask(task).subscribe({
       next: () => {
@@ -79,6 +97,11 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  /**
+   * Updates an existing task using the task service
+   * @param id The ID of the task to update
+   * @param task The updated task data
+   */
   updateTask(id: string, task: Task): void {
     this.taskService.updateTask(id, task).subscribe({
       next: () => {
@@ -90,6 +113,10 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  /**
+   * Deletes a task from the system
+   * @param id The ID of the task to delete
+   */
   deleteTask(id: string): void {
     if (confirm('Are you sure you want to delete this task?')) {
       this.taskService.deleteTask(id).subscribe({
@@ -103,6 +130,11 @@ export class DashboardComponent implements OnInit {
     }
   }
 
+  /**
+   * Returns the appropriate color for a task's status chip
+   * @param status The status of the task
+   * @returns The color to be used for the status chip
+   */
   getStatusColor(status: string): string {
     switch (status.toLowerCase()) {
       case 'completed':

@@ -1,3 +1,7 @@
+/**
+ * Component responsible for handling user login functionality.
+ * Provides a form for users to enter their email and password to authenticate.
+ */
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -8,7 +12,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../services/auth.service';
 import { LogoComponent } from '../logo/logo.component';
 
@@ -32,14 +36,18 @@ import { LogoComponent } from '../logo/logo.component';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
+  // Form group for login with email and password fields
   loginForm: FormGroup;
+  // Controls password visibility in the form
   hidePassword = true;
 
   constructor(
     private fb: FormBuilder,
     public authService: AuthService,
-    private router: Router
+    private router: Router,
+    private snackBar: MatSnackBar
   ) {
+    // Initialize the form with validation rules
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
@@ -48,14 +56,36 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {}
 
+  /**
+   * Handles form submission for login
+   * Validates form and calls auth service to authenticate user
+   * Redirects to dashboard on success
+   */
   onSubmit(): void {
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;
       this.authService.login(email, password).subscribe({
         next: () => {
-          this.router.navigate(['/dashboard']);
+          // Show success message
+          this.snackBar.open('Sign in successful!', 'Close', {
+            duration: 3000,
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            panelClass: ['success-snackbar']
+          });
+          // Navigate to dashboard after a short delay
+          setTimeout(() => {
+            this.router.navigate(['/dashboard']);
+          }, 1000);
         },
         error: (error) => {
+          // Show error message
+          this.snackBar.open(error.message || 'Login failed', 'Close', {
+            duration: 3000,
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            panelClass: ['error-snackbar']
+          });
           console.error('Login error:', error);
         }
       });

@@ -1,3 +1,7 @@
+/**
+ * Component responsible for handling user registration functionality.
+ * Provides a form for new users to create an account with their personal information.
+ */
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -32,8 +36,11 @@ import { LogoComponent } from '../logo/logo.component';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit {
+  // Form group for registration with all required fields
   registerForm: FormGroup;
+  // Controls password visibility in the form
   hidePassword = true;
+  // Controls confirm password visibility in the form
   hideConfirmPassword = true;
 
   constructor(
@@ -41,6 +48,7 @@ export class RegisterComponent implements OnInit {
     public authService: AuthService,
     private router: Router
   ) {
+    // Initialize the form with validation rules and custom password match validator
     this.registerForm = this.fb.group({
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
@@ -52,12 +60,22 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit(): void {}
 
+  /**
+   * Custom validator to ensure password and confirm password match
+   * @param g FormGroup containing the form controls
+   * @returns null if passwords match, error object if they don't
+   */
   passwordMatchValidator(g: FormGroup) {
     return g.get('password')?.value === g.get('confirmPassword')?.value
       ? null
       : { mismatch: true };
   }
 
+  /**
+   * Handles form submission for registration
+   * Validates form and calls auth service to create new user
+   * Redirects to login page on success
+   */
   onSubmit(): void {
     if (this.registerForm.valid) {
       const { firstName, lastName, email, password, confirmPassword } = this.registerForm.value;

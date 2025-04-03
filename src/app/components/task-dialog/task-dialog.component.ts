@@ -1,3 +1,7 @@
+/**
+ * Component responsible for creating and editing tasks through a dialog interface.
+ * Provides a form for users to input task details and handles task creation/updating.
+ */
 import { Component, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -28,8 +32,11 @@ import { Task } from '../../models/task.model';
   ]
 })
 export class TaskDialogComponent {
+  // Form group for task details
   taskForm: FormGroup;
+  // Title to display in the dialog header
   dialogTitle: string;
+  // Available options for task status
   statusOptions = [
     { value: 'todo', label: 'To Do' },
     { value: 'in-progress', label: 'In Progress' },
@@ -41,7 +48,9 @@ export class TaskDialogComponent {
     private dialogRef: MatDialogRef<TaskDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { task: Task | null }
   ) {
+    // Set dialog title based on whether we're creating or editing
     this.dialogTitle = data.task ? 'Edit Task' : 'Create Task';
+    // Initialize the form with validation rules and existing task data if editing
     this.taskForm = this.fb.group({
       title: [data.task?.title || '', [Validators.required]],
       description: [data.task?.description || '', [Validators.required]],
@@ -50,12 +59,19 @@ export class TaskDialogComponent {
     });
   }
 
+  /**
+   * Handles form submission
+   * Closes the dialog with the form data if valid
+   */
   onSubmit(): void {
     if (this.taskForm.valid) {
       this.dialogRef.close(this.taskForm.value);
     }
   }
 
+  /**
+   * Closes the dialog without saving changes
+   */
   onCancel(): void {
     this.dialogRef.close();
   }
