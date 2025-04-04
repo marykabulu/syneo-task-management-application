@@ -124,8 +124,19 @@ export class AuthService {
   register(name: string, email: string, password: string): Observable<AuthResponse> {
     // Put up the "busy" sign
     this.isLoadingSubject.next(true);
+    
+    // Split the full name into first and last name
+    const nameParts = name.split(' ');
+    const firstName = nameParts[0];
+    const lastName = nameParts.slice(1).join(' ') || ''; // Handle case where there's no last name
+    
     // Send the registration information to the server
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, { name, email, password }).pipe(
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, { 
+      firstName, 
+      lastName, 
+      email, 
+      password 
+    }).pipe(
       // If registration is successful, save their ID card and update our guest list
       tap(response => {
         localStorage.setItem('token', response.token);
