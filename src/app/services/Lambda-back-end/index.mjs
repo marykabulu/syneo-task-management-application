@@ -91,7 +91,7 @@ import {
       TableName: VERIFICATION_CODES_TABLE,
       Item: {
         email: { S: email },
-        code: { S: verificationCode },
+        "verification-code": { S: verificationCode },
         expiresAt: { N: (Math.floor(Date.now() / 1000) + 3600).toString() },
         createdAt: { S: timestamp }
       }
@@ -203,7 +203,7 @@ import {
   // 🔹 Send Verification Email
   async function sendVerificationEmail(email, code, firstName) {
     const params = {
-      Source: "your-verified-email@example.com",
+      Source: "mkabulu1@gmail.com",
       Destination: { ToAddresses: [email] },
       Message: {
         Subject: { Data: "Verify Your Account" },
