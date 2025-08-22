@@ -104,60 +104,94 @@ import {
   
   // 🔹 Handle Email Verification
   async function handleVerifyCode(event) {
-    const { email, code } = JSON.parse(event.body);
-  
-    if (!email || !code) {
-      return formatResponse(400, { success: false, message: 'Email and code are required' });
-    }
-  
-    // 🔹 Check if the user exists
-    const userResult = await dynamoDB.send(new QueryCommand({
-      TableName: USERS_TABLE,
-      IndexName: "email-userId-index",
-      KeyConditionExpression: "email = :email",
-      ExpressionAttributeValues: {
-        ":email": { S: email }
+    try {
+      console.log('Verification request received:', JSON.stringify(event));
+      const { email, code } = JSON.parse(event.body);
+      console.log('Parsed email and code:', { email, code });
+
+      if (!email || !code) {
+        console.log('Missing email or code');
+        return formatResponse(400, { success: false, message: 'Email and code are required' });
       }
-    }));
-  
-    if (!userResult.Items || userResult.Items.length === 0) {
-      return formatResponse(404, { success: false, message: 'User not found' });
-    }
-  
-    const user = userResult.Items[0];
-    if (user.verified.BOOL) {
-      return formatResponse(200, { success: true, message: 'Account already verified' });
-    }
-  
-    // 🔹 Check verification code
-    const codeResult = await dynamoDB.send(new QueryCommand({
-      TableName: VERIFICATION_CODES_TABLE,
-      KeyConditionExpression: "email = :email",
-      ExpressionAttributeValues: {
-        ":email": { S: email }
+
+      // 🔹 Check if the user exists
+      console.log('Checking if user exists:', email);
+      const userResult = await dynamoDB.send(new QueryCommand({
+        TableName: USERS_TABLE,
+        IndexName: "email-userId-index",
+        KeyConditionExpression: "email = :email",
+        ExpressionAttributeValues: {
+          ":email": { S: email }
+        }
+      }));
+      console.log('User query result:', JSON.stringify(userResult));
+
+      if (!userResult.Items || userResult.Items.length === 0) {
+        console.log('User not found');
+        return formatResponse(404, { success: false, message: 'User not found' });
       }
-    }));
-  
-    if (!codeResult.Items || codeResult.Items[0].code.S !== code) {
-      return formatResponse(400, { success: false, message: 'Invalid or expired verification code' });
-    }
-  
-    await dynamoDB.send(new UpdateItemCommand({
-      TableName: USERS_TABLE,
-      Key: { email: { S: email } },
-      UpdateExpression: 'SET verified = :verified, updatedAt = :updatedAt',
-      ExpressionAttributeValues: {
-        ':verified': { BOOL: true },
-        ':updatedAt': { S: new Date().toISOString() }
+
+      const user = userResult.Items[0];
+      if (user.verified.BOOL) {
+        console.log('User already verified');
+        return formatResponse(200, { success: true, message: 'Account already verified' });
       }
-    }));
-  
-    await dynamoDB.send(new DeleteItemCommand({
-      TableName: VERIFICATION_CODES_TABLE,
-      Key: { email: { S: email } }
-    }));
-  
-    return formatResponse(200, { success: true, message: 'Email verified successfully. You can now login.' });
+
+      // 🔹 Check verification code
+      console.log('Checking verification code');
+      const codeResult = await dynamoDB.send(new QueryCommand({
+        TableName: VERIFICATION_CODES_TABLE,
+        KeyConditionExpression: "email = :email",
+        ExpressionAttributeValues: {
+          ":email": { S: email }
+        }
+      }));
+      console.log('Verification code query result:', JSON.stringify(codeResult));
+
+      if (!codeResult.Items || codeResult.Items.length === 0) {
+        console.log('No verification code found');
+        return formatResponse(400, { success: false, message: 'No verification code found' });
+      }
+
+      const storedCode = codeResult.Items[0]['verification-code'].S;
+      console.log('Comparing codes:', { storedCode, providedCode: code });
+      
+      if (storedCode !== code) {
+        console.log('Invalid verification code');
+        return formatResponse(400, { success: false, message: 'Invalid or expired verification code' });
+      }
+
+      // Update user verification status
+      console.log('Updating user verification status');
+      await dynamoDB.send(new UpdateItemCommand({
+        TableName: USERS_TABLE,
+        Key: { email: { S: email } },
+        UpdateExpression: 'SET verified = :verified, updatedAt = :updatedAt',
+        ExpressionAttributeValues: {
+          ':verified': { BOOL: true },
+          ':updatedAt': { S: new Date().toISOString() }
+        }
+      }));
+
+      // Delete used verification code
+      console.log('Deleting used verification code');
+      await dynamoDB.send(new DeleteItemCommand({
+        TableName: VERIFICATION_CODES_TABLE,
+        Key: { email: { S: email } }
+      }));
+
+      console.log('Verification successful');
+      return formatResponse(200, { success: true, message: 'Email verified successfully. You can now login.' });
+    } catch (error) {
+      console.error('Verification error:', error);
+      console.error('Error stack:', error.stack);
+      return formatResponse(500, { 
+        success: false, 
+        message: 'Internal server error',
+        error: error.message,
+        stack: error.stack
+      });
+    }
   }
   
   // 🔹 Handle User Login

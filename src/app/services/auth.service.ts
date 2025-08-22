@@ -205,8 +205,24 @@ export class AuthService {
    * Think of it as the receptionist reading an ID card to get the person's details.
    */
   private getUserFromToken(token: string): User | null {
-    // This is where we would normally decode the token to get user information
-    // For now, we're just returning null as a placeholder
-    return null;
+    try {
+      // Check if token has JWT format (3 parts separated by dots)
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        return null;
+      }
+      
+      // Decode JWT token to get user information
+      const payload = JSON.parse(atob(parts[1]));
+      return {
+        id: payload.sub || payload.id,
+        email: payload.email,
+        firstName: payload.firstName || payload.first_name || '',
+        lastName: payload.lastName || payload.last_name || ''
+      };
+    } catch (error) {
+      // Token is not a valid JWT, return null
+      return null;
+    }
   }
 } 
