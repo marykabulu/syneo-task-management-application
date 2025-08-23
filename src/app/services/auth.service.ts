@@ -21,6 +21,7 @@ export interface User {
   lastName: string;  // The user's last name
 }
 
+
 /**
  * This interface defines what we get back when someone successfully logs in or registers.
  * It's like a receipt that contains both the user's information and a special key (token)
@@ -151,15 +152,16 @@ export class AuthService {
    * This method handles when someone forgets their password.
    * Think of it as the receptionist helping someone get a new password.
    */
-  forgotPassword(email: string): Observable<void> {
-    // Put up the "busy" sign
-    this.isLoadingSubject.next(true);
-    // Send the request to reset the password
-    return this.http.post<void>(`${this.apiUrl}/auth/forgot-password`, { email }).pipe(
-      // Take down the "busy" sign when we're done
-      finalize(() => this.isLoadingSubject.next(false))
-    );
-  }
+  // ... existing code ...
+
+forgotPassword(email: string): Observable<void> {
+  this.isLoadingSubject.next(true);
+  return this.http.post<void>(`${this.apiUrl}/auth/forgot-password`, { email }).pipe(
+    finalize(() => this.isLoadingSubject.next(false))
+  );
+}
+
+// ... existing code ...
 
   /**
    * This method verifies a code sent to someone's email.
@@ -179,15 +181,28 @@ export class AuthService {
    * This method allows someone to set a new password after verifying their code.
    * Think of it as the receptionist helping someone set up a new password after verification.
    */
-  resetPassword(email: string, code: string, password: string): Observable<void> {
-    // Put up the "busy" sign
-    this.isLoadingSubject.next(true);
-    // Send the new password information to the server
-    return this.http.post<void>(`${this.apiUrl}/auth/reset-password`, { email, code, password }).pipe(
-      // Take down the "busy" sign when we're done
-      finalize(() => this.isLoadingSubject.next(false))
-    );
-  }
+  // ... existing code ...
+
+/**
+ * This method allows someone to set a new password after verifying their code.
+ * Think of it as the receptionist helping someone set up a new password after verification.
+ */
+// ... existing code ...
+
+resetPassword(email: string, resetToken: string, newPassword: string): Observable<void> {
+  this.isLoadingSubject.next(true);
+  return this.http.post<void>(`${this.apiUrl}/auth/reset-password`, { 
+    email, 
+    resetToken, 
+    newPassword 
+  }).pipe(
+    finalize(() => this.isLoadingSubject.next(false))
+  );
+}
+
+// ... existing code ...
+
+// ... existing code ...
 
   /**
    * This method handles when someone logs out.
