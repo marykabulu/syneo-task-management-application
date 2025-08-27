@@ -333,6 +333,7 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeChatbot();
+    this.loadFavorites();
   }
 
   setActiveSection(section: string): void {
@@ -507,6 +508,133 @@ export class DashboardComponent implements OnInit {
     if (grade.includes('C')) return 'grade-c';
     return 'grade-d';
   }
- 
+
+  connectAICoach(subject: string): void {
+    alert(`Connecting to AI Coach for ${subject}...`);
+  }
+
+  findYoutubeTutorials(subject: string): void {
+    alert(`Finding best YouTube tutorials for ${subject}...`);
+  }
+
+  selectedSubject: any = null;
+  selectedTopic: any = null;
+  aiExamples: { [key: string]: string[] } = {};
+  aiExamplesVisible: { [key: string]: boolean } = {};
+  favorites: { [key: string]: boolean } = {
+    'syllabus': true
+  };
+
+  navItems = [
+    { section: 'overview', name: 'Overview', icon: 'fa-home' },
+    { section: 'syllabus', name: 'Syllabus', icon: 'fa-book' },
+    { section: 'progress', name: 'Progress', icon: 'fa-chart-line' },
+    { section: 'homework', name: 'Homework', icon: 'fa-tasks' },
+    { section: 'files', name: 'Course Files', icon: 'fa-folder' },
+    { section: 'translate', name: 'Translator', icon: 'fa-language' },
+    { section: 'upload', name: 'Upload Files', icon: 'fa-upload' },
+    { section: 'assignments', name: 'Assignments', icon: 'fa-clipboard-check' },
+    { section: 'mock-exams', name: 'Mock Exams', icon: 'fa-file-alt' },
+    { section: 'grading', name: 'Grading', icon: 'fa-chart-bar' },
+    { section: 'collaborate', name: 'Collaborate', icon: 'fa-users' }
+  ];
+
+  openSubjectStudyPlan(subject: any) {
+    this.selectedSubject = {
+      ...subject,
+      studyPlan: this.generateStudyPlan(subject.name)
+    };
+    this.selectedTopic = this.selectedSubject.studyPlan[0];
+  }
+
+  backToSyllabus() {
+    this.selectedSubject = null;
+    this.selectedTopic = null;
+  }
+
+  selectTopic(topic: any) {
+    if (topic.status === 'locked') return;
+    this.selectedTopic = topic;
+  }
+
+  getTopicStatusClass(status: string): string {
+    switch (status) {
+      case 'mastered': return 'status-mastered';
+      case 'overdue': return 'status-overdue';
+      case 'locked': return 'status-locked';
+      default: return 'status-current';
+    }
+  }
+
+  getTopicIcon(status: string): string {
+    switch (status) {
+      case 'mastered': return 'fa-check-circle';
+      case 'overdue': return 'fa-exclamation-triangle';
+      case 'locked': return 'fa-lock';
+      default: return 'fa-play-circle';
+    }
+  }
+
+  toggleAIExamples(topicId: string) {
+    if (!this.aiExamplesVisible[topicId]) {
+      this.aiExamples[topicId] = [
+        'AI Generated Example 1: Interactive problem solving approach',
+        'AI Generated Example 2: Step-by-step solution method',
+        'AI Generated Activity: Practice exercises with instant feedback'
+      ];
+    }
+    this.aiExamplesVisible[topicId] = !this.aiExamplesVisible[topicId];
+  }
+
+  toggleFavorite(section: string, event: Event) {
+    event.stopPropagation();
+    this.favorites[section] = !this.favorites[section];
+    this.saveFavorites();
+  }
+
+  getFavoriteItems() {
+    return this.navItems
+      .filter(item => this.favorites[item.section])
+      .slice(0, 4);
+  }
+
+  private loadFavorites(): void {
+    try {
+      const raw = localStorage.getItem('dashboard_favorites');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') {
+          this.favorites = parsed;
+        }
+      }
+    } catch {
+      // ignore malformed data
+    }
+  }
+
+  private saveFavorites(): void {
+    try {
+      localStorage.setItem('dashboard_favorites', JSON.stringify(this.favorites));
+    } catch {
+      // storage may be unavailable; fail silently
+    }
+  }
+
+  private generateStudyPlan(subjectName: string) {
+    const plans: any = {
+      'Mathematics': [
+        { id: '1', title: 'Algebra Basics', duration: '2 weeks', status: 'mastered', content: 'Introduction to algebraic expressions and equations.', bookExamples: ['Solve: 2x + 5 = 15', 'Simplify: 3(x + 4) - 2x'] },
+        { id: '2', title: 'Linear Equations', duration: '3 weeks', status: 'mastered', content: 'Working with linear equations in one and two variables.', bookExamples: ['Graph: y = 2x + 3', 'Solve system: x + y = 5, 2x - y = 1'] },
+        { id: '3', title: 'Quadratic Functions', duration: '4 weeks', status: 'overdue', content: 'Understanding quadratic functions and their graphs.', bookExamples: ['Factor: x² - 5x + 6', 'Find vertex of: y = x² - 4x + 3'] },
+        { id: '4', title: 'Trigonometry', duration: '3 weeks', status: 'locked', content: 'Basic trigonometric functions and identities.', bookExamples: [] }
+      ],
+      'Physics': [
+        { id: '1', title: 'Motion and Forces', duration: '3 weeks', status: 'mastered', content: 'Newton\'s laws of motion and force calculations.', bookExamples: ['Calculate force: F = ma where m=5kg, a=2m/s²'] },
+        { id: '2', title: 'Energy and Work', duration: '2 weeks', status: 'overdue', content: 'Kinetic and potential energy concepts.', bookExamples: ['Calculate KE: ½mv² where m=10kg, v=5m/s'] },
+        { id: '3', title: 'Waves and Sound', duration: '4 weeks', status: 'locked', content: 'Wave properties and sound phenomena.', bookExamples: [] }
+      ]
+    };
+    return plans[subjectName] || [];
+  }
 
 }

@@ -87,11 +87,14 @@
 .nav-item {
   display: flex;
   align-items: center;
-  padding: 12px 24px;
+  justify-content: space-between;
+  padding: 16px 24px;
   color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
   transition: all 0.3s ease;
   border-left: 3px solid transparent;
+  position: relative;
+  min-height: 50px;
 }
 
 .nav-item:hover {
@@ -109,6 +112,37 @@
   margin-right: 12px;
   width: 20px;
   font-size: 16px;
+}
+
+.favorite-star {
+  font-size: 18px !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 8px;
+  border-radius: 6px;
+  margin: 0 !important;
+  width: auto !important;
+  min-width: 34px;
+  text-align: center;
+}
+
+.favorite-star:hover {
+  color: #fbbf24 !important;
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.2);
+}
+
+.favorite-star.favorited {
+  color: #fbbf24 !important;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.7);
+  background: rgba(251, 191, 36, 0.1);
+}
+
+.nav-item .nav-content {
+  display: flex;
+  align-items: center;
+  flex: 1;
 }
 
 /* Main Content */
@@ -686,6 +720,283 @@
   font-weight: 600;
 }
 
+.btn-small.primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+}
+
+.btn-small.primary:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  transform: translateY(-1px);
+}
+
+.btn-small.secondary {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.btn-small.secondary:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-1px);
+}
+
+.btn-small.ai-coach {
+  background: linear-gradient(135deg, #8b5cf6, #a855f7);
+  color: white;
+}
+
+.btn-small.ai-coach:hover {
+  background: linear-gradient(135deg, #7c3aed, #9333ea);
+  transform: translateY(-1px);
+}
+
+.btn-small.youtube {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+}
+
+.btn-small.youtube:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-1px);
+}
+
+.subject-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-small {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+/* Subject Study Plan Styles */
+.subject-name-clickable {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.subject-name-clickable:hover {
+  color: #8b5cf6;
+}
+
+.study-plan-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.back-btn {
+  padding: 8px 16px;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s ease;
+}
+
+.back-btn:hover {
+  background: #e5e7eb;
+}
+
+.study-plan-container {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 24px;
+  height: 600px;
+}
+
+.study-plan-toc {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.study-plan-toc h3 {
+  margin: 0 0 16px 0;
+  color: #1f2937;
+  font-size: 18px;
+}
+
+.toc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toc-item {
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.toc-item:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.toc-item.selected {
+  background: #e0e7ff;
+  border-left: 4px solid #6366f1;
+}
+
+.toc-item.status-mastered {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.toc-item.status-overdue {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.toc-item.status-locked {
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.topic-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.topic-title {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.topic-duration {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.lesson-content {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.lesson-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.lesson-header h3 {
+  margin: 0;
+  color: #1f2937;
+}
+
+.lesson-status {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.lesson-status.status-mastered {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.lesson-status.status-overdue {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.lesson-status.status-current {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.lesson-body h4 {
+  color: #374151;
+  margin: 0 0 12px 0;
+  font-size: 16px;
+}
+
+.lesson-text {
+  margin-bottom: 24px;
+}
+
+.lesson-text p {
+  line-height: 1.6;
+  color: #4b5563;
+}
+
+.examples-section {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 24px;
+}
+
+.examples-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.book-examples h5,
+.ai-examples h5 {
+  margin: 0 0 12px 0;
+  color: #374151;
+  font-size: 14px;
+}
+
+.example-item {
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.example-item.ai-example {
+  background: #f0f9ff;
+  border-left: 4px solid #0ea5e9;
+}
+
+.btn-ai-examples {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #8b5cf6, #a855f7);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-ai-examples:hover {
+  background: linear-gradient(135deg, #7c3aed, #9333ea);
+  transform: translateY(-1px);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .main-content {
@@ -708,5 +1019,14 @@
   
   .newsletters-header {
     border-radius: 0;
+  }
+  
+  .study-plan-container {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  
+  .study-plan-toc {
+    height: 300px;
   }
 }

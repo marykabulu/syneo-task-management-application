@@ -17,48 +17,61 @@
     
     <div class="nav-menu">
       <div class="nav-item" [class.active]="activeSection === 'overview'" (click)="setActiveSection('overview')">
-        <i class="fas fa-home"></i>
-        <span>Overview</span>
+        <div class="nav-content">
+          <i class="fas fa-home"></i>
+          <span>Overview</span>
+        </div>
+        <i class="fas fa-star favorite-star" [class.favorited]="favorites['overview']" (click)="toggleFavorite('overview', $event)"></i>
       </div>
       <div class="nav-item" [class.active]="activeSection === 'syllabus'" (click)="setActiveSection('syllabus')">
         <i class="fas fa-book"></i>
         <span>Syllabus</span>
+        <i class="fas fa-star favorite-star" [class.favorited]="favorites['syllabus']" (click)="toggleFavorite('syllabus', $event)"></i>
       </div>
       <div class="nav-item" [class.active]="activeSection === 'progress'" (click)="setActiveSection('progress')">
         <i class="fas fa-chart-line"></i>
         <span>Progress</span>
+        <i class="fas fa-star favorite-star" [class.favorited]="favorites['progress']" (click)="toggleFavorite('progress', $event)"></i>
       </div>
       <div class="nav-item" [class.active]="activeSection === 'homework'" (click)="setActiveSection('homework')">
         <i class="fas fa-tasks"></i>
         <span>Homework</span>
+        <i class="fas fa-star favorite-star" [class.favorited]="favorites['homework']" (click)="toggleFavorite('homework', $event)"></i>
       </div>
       <div class="nav-item" [class.active]="activeSection === 'files'" (click)="setActiveSection('files')">
         <i class="fas fa-folder"></i>
         <span>Course Files</span>
+        <i class="fas fa-star favorite-star" [class.favorited]="favorites['files']" (click)="toggleFavorite('files', $event)"></i>
       </div>
       <div class="nav-item" [class.active]="activeSection === 'translate'" (click)="setActiveSection('translate')">
         <i class="fas fa-language"></i>
         <span>Translator</span>
+        <i class="fas fa-star favorite-star" [class.favorited]="favorites['translate']" (click)="toggleFavorite('translate', $event)"></i>
       </div>
       <div class="nav-item" [class.active]="activeSection === 'upload'" (click)="setActiveSection('upload')">
         <i class="fas fa-upload"></i>
         <span>Upload Files</span>
+        <i class="fas fa-star favorite-star" [class.favorited]="favorites['upload']" (click)="toggleFavorite('upload', $event)"></i>
       </div>
       <div class="nav-item" [class.active]="activeSection === 'assignments'" (click)="setActiveSection('assignments')">
         <i class="fas fa-clipboard-check"></i>
         <span>Assignments</span>
+        <i class="fas fa-star favorite-star" [class.favorited]="favorites['assignments']" (click)="toggleFavorite('assignments', $event)"></i>
       </div>
       <div class="nav-item" [class.active]="activeSection === 'mock-exams'" (click)="setActiveSection('mock-exams')">
         <i class="fas fa-file-alt"></i>
         <span>Mock Exams</span>
+        <i class="fas fa-star favorite-star" [class.favorited]="favorites['mock-exams']" (click)="toggleFavorite('mock-exams', $event)"></i>
       </div>
       <div class="nav-item" [class.active]="activeSection === 'grading'" (click)="setActiveSection('grading')">
         <i class="fas fa-chart-bar"></i>
         <span>Grading</span>
+        <i class="fas fa-star favorite-star" [class.favorited]="favorites['grading']" (click)="toggleFavorite('grading', $event)"></i>
       </div>
       <div class="nav-item" [class.active]="activeSection === 'collaborate'" (click)="setActiveSection('collaborate')">
         <i class="fas fa-users"></i>
         <span>Collaborate</span>
+        <i class="fas fa-star favorite-star" [class.favorited]="favorites['collaborate']" (click)="toggleFavorite('collaborate', $event)"></i>
       </div>
     </div>
   </nav>
@@ -125,17 +138,9 @@
         <div class="quick-actions">
           <h2>Quick Actions</h2>
           <div class="action-buttons">
-            <button class="action-btn primary" (click)="setActiveSection('upload')">
-              <i class="fas fa-upload"></i>
-              Upload to AI Model
-            </button>
-            <button class="action-btn secondary" (click)="toggleChatbot()">
-              <i class="fas fa-robot"></i>
-              AI Assistant
-            </button>
-            <button class="action-btn tertiary" (click)="joinCollaborationRoom()">
-              <i class="fas fa-video"></i>
-              Join Study Room
+            <button *ngFor="let item of getFavoriteItems()" class="action-btn primary" (click)="setActiveSection(item.section)">
+              <i class="fas" [ngClass]="item.icon"></i>
+              {{item.name}}
             </button>
           </div>
         </div>
@@ -143,22 +148,107 @@
 
       <!-- Syllabus Section -->
       <div *ngIf="activeSection === 'syllabus'" class="section syllabus-section">
-        <h2>Annual Syllabus</h2>
-        <div class="subjects-grid">
-          <div *ngFor="let subject of subjects" class="subject-card">
-            <div class="subject-header">
-              <h3>{{subject.name}}</h3>
-              <span class="teacher-name">{{subject.teacher}}</span>
-            </div>
-            <div class="subject-progress">
-              <div class="progress-bar">
-                <div class="progress-fill" [style.width.%]="subject.progress"></div>
+        <!-- Subject List View -->
+        <div *ngIf="!selectedSubject">
+          <h2>Annual Syllabus</h2>
+          <div class="subjects-grid">
+            <div *ngFor="let subject of subjects" class="subject-card">
+              <div class="subject-header">
+                <h3 class="subject-name-clickable" (click)="openSubjectStudyPlan(subject)">{{subject.name}}</h3>
+                <span class="teacher-name">{{subject.teacher}}</span>
               </div>
-              <span class="progress-text">{{subject.progress}}% Complete</span>
+              <div class="subject-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" [style.width.%]="subject.progress"></div>
+                </div>
+                <span class="progress-text">{{subject.progress}}% Complete</span>
+              </div>
+              <div class="subject-actions">
+                <button class="btn-small primary" (click)="generateWeeklyTest(subject.id)">Generate Test</button>
+                <button class="btn-small secondary" (click)="contactTeacher(subject.name)">Contact Teacher</button>
+                <button class="btn-small ai-coach" (click)="connectAICoach(subject.name)">
+                  <i class="fas fa-robot"></i>
+                  AI Coach Connect
+                </button>
+                <button class="btn-small youtube" (click)="findYoutubeTutorials(subject.name)">
+                  <i class="fab fa-youtube"></i>
+                  YouTube Tutorials
+                </button>
+              </div>
             </div>
-            <div class="subject-actions">
-              <button class="btn-small primary" (click)="generateWeeklyTest(subject.id)">Generate Test</button>
-              <button class="btn-small secondary" (click)="contactTeacher(subject.name)">Contact Teacher</button>
+          </div>
+        </div>
+
+        <!-- Subject Study Plan View -->
+        <div *ngIf="selectedSubject">
+          <div class="study-plan-header">
+            <button class="back-btn" (click)="backToSyllabus()">
+              <i class="fas fa-arrow-left"></i>
+              Back to Syllabus
+            </button>
+            <h2>{{selectedSubject.name}} - Study Plan</h2>
+          </div>
+          
+          <div class="study-plan-container">
+            <div class="study-plan-toc">
+              <h3>Course Content</h3>
+              <div class="toc-list">
+                <div *ngFor="let topic of selectedSubject.studyPlan" 
+                     class="toc-item" 
+                     [ngClass]="getTopicStatusClass(topic.status)"
+                     (click)="selectTopic(topic)"
+                     [class.selected]="selectedTopic?.id === topic.id">
+                  <div class="topic-info">
+                    <span class="topic-title">{{topic.title}}</span>
+                    <span class="topic-duration">{{topic.duration}}</span>
+                  </div>
+                  <i class="fas" [ngClass]="getTopicIcon(topic.status)"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="lesson-content" *ngIf="selectedTopic">
+              <div class="lesson-header">
+                <h3>{{selectedTopic.title}}</h3>
+                <span class="lesson-status" [ngClass]="getTopicStatusClass(selectedTopic.status)">
+                  {{selectedTopic.status | titlecase}}
+                </span>
+              </div>
+              
+              <div class="lesson-body">
+                <div class="lesson-text">
+                  <h4>Lesson Overview</h4>
+                  <p>{{selectedTopic.content}}</p>
+                </div>
+                
+                <div class="examples-section">
+                  <h4>Examples</h4>
+                  <div class="examples-container">
+                    <div class="book-examples" *ngIf="selectedTopic.bookExamples?.length">
+                      <h5>Book Examples</h5>
+                      <div *ngFor="let example of selectedTopic.bookExamples" class="example-item">
+                        <p>{{example}}</p>
+                      </div>
+                    </div>
+                    
+                    <div class="ai-examples-section">
+                      <button class="btn-ai-examples" (click)="toggleAIExamples(selectedTopic.id)">
+                        <i class="fas fa-robot"></i>
+                        <span *ngIf="!aiExamplesVisible[selectedTopic.id]">Generate AI Examples & Activities</span>
+                        <span *ngIf="aiExamplesVisible[selectedTopic.id]">Hide AI Examples</span>
+                        <i class="fas" [ngClass]="aiExamplesVisible[selectedTopic.id] ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                      </button>
+                      
+                      <div *ngIf="aiExamplesVisible[selectedTopic.id]" class="ai-examples">
+                        <h5>AI Generated Examples</h5>
+                        <div *ngFor="let example of aiExamples[selectedTopic.id]" class="example-item ai-example">
+                          <p>{{example}}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
