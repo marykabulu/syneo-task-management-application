@@ -180,6 +180,14 @@ export class DashboardComponent implements OnInit {
   selectedFiles: FileList | null = null;
   isSidebarCollapsed: boolean = false;
   isNewslettersOpen: boolean = false;
+  
+  stationaryItems = [
+    { name: 'Pencils', have: true },
+    { name: 'Erasers', have: false },
+    { name: 'Ruler', have: true },
+    { name: 'Calculator', have: false },
+    { name: 'Notebooks', have: true }
+  ];
 
 
   languages = [
@@ -618,6 +626,20 @@ export class DashboardComponent implements OnInit {
     } catch {
       // storage may be unavailable; fail silently
     }
+  }
+
+  getMissingItems(): string[] {
+    return this.stationaryItems.filter(item => !item.have).map(item => item.name);
+  }
+
+  updateStationaryStatus(): void {
+    console.log('Stationary status updated');
+  }
+
+  saveStationaryStatus(): void {
+    const missingItems = this.getMissingItems();
+    console.log('Missing items to report to parents:', missingItems);
+    alert(`Status saved! Missing items: ${missingItems.join(', ')}`);
   }
 
   private generateStudyPlan(subjectName: string) {

@@ -13,6 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSelectModule } from '@angular/material/select';
 import { AuthService } from '../../services/auth.service';
 import { LogoComponent } from '../logo/logo.component';
 
@@ -30,6 +31,7 @@ import { LogoComponent } from '../logo/logo.component';
     MatIconModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
+    MatSelectModule,
     LogoComponent
   ],
   templateUrl: './login.component.html',
@@ -49,6 +51,7 @@ export class LoginComponent implements OnInit {
   ) {
     // Initialize the form with validation rules
     this.loginForm = this.fb.group({
+      userRole: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
@@ -63,7 +66,7 @@ export class LoginComponent implements OnInit {
    */
   onSubmit(): void {
     if (this.loginForm.valid) {
-      const { email, password } = this.loginForm.value;
+      const { userRole, email, password } = this.loginForm.value;
       this.authService.login(email, password).subscribe({
         next: () => {
           // Show success message
@@ -73,9 +76,30 @@ export class LoginComponent implements OnInit {
             verticalPosition: 'top',
             panelClass: ['success-snackbar']
           });
-          // Navigate to dashboard after a short delay
+          // Navigate based on user role
+          console.log('Selected user role:', userRole);
           setTimeout(() => {
-            this.router.navigate(['/dashboard']);
+            switch(userRole) {
+              case 'student':
+                console.log('Navigating to dashboard');
+                this.router.navigate(['/dashboard']);
+                break;
+              case 'teacher':
+                console.log('Navigating to teacher');
+                this.router.navigate(['/teacher']);
+                break;
+              case 'parent':
+                console.log('Navigating to parent');
+                this.router.navigate(['/parent']);
+                break;
+              case 'admin':
+                console.log('Navigating to dashboard (admin)');
+                this.router.navigate(['/dashboard']);
+                break;
+              default:
+                console.log('Navigating to dashboard (default)');
+                this.router.navigate(['/dashboard']);
+            }
           }, 1000);
         },
         error: (error) => {

@@ -1,0 +1,410 @@
+<div class="dashboard-container">
+  <!-- Sidebar Toggle Button -->
+  <button class="sidebar-toggle" (click)="toggleSidebar()" [class.collapsed]="isSidebarCollapsed">
+    <i class="fas fa-bars"></i>
+  </button>
+  
+  <!-- Sidebar Navigation -->
+  <nav class="sidebar" [class.collapsed]="isSidebarCollapsed">
+    <div class="sidebar-header">
+      <div class="logo">
+        <div class="logo-icon">
+          <i class="fas fa-user-friends"></i>
+        </div>
+        <span class="logo-text">ParentHub</span>
+      </div>
+    </div>
+    
+    <div class="nav-menu">
+      <div class="nav-item" [class.active]="activeSection === 'overview'" (click)="setActiveSection('overview')">
+        <i class="fas fa-home"></i>
+        <span>Overview</span>
+      </div>
+      <div class="nav-item" [class.active]="activeSection === 'child-profile'" (click)="setActiveSection('child-profile')">
+        <i class="fas fa-user-graduate"></i>
+        <span>Child Profile</span>
+      </div>
+      <div class="nav-item" [class.active]="activeSection === 'billing'" (click)="setActiveSection('billing')">
+        <i class="fas fa-credit-card"></i>
+        <span>Billing & Fees</span>
+      </div>
+      <div class="nav-item" [class.active]="activeSection === 'schedule'" (click)="setActiveSection('schedule')">
+        <i class="fas fa-calendar-alt"></i>
+        <span>Schedule</span>
+      </div>
+      <div class="nav-item" [class.active]="activeSection === 'school-connect'" (click)="setActiveSection('school-connect')">
+        <i class="fas fa-school"></i>
+        <span>School Connect</span>
+      </div>
+      <div class="nav-item" [class.active]="activeSection === 'mail'" (click)="setActiveSection('mail')">
+        <i class="fas fa-envelope"></i>
+        <span>Mail</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content" [class.expanded]="isSidebarCollapsed">
+    <!-- Header -->
+    <header class="header">
+      <div class="welcome-section">
+        <h1>Welcome, {{parent.name}}!</h1>
+        <p>Stay connected with {{child.name}}'s educational journey</p>
+      </div>
+      
+      <div class="parent-profile">
+        <div class="parent-info">
+          <div class="parent-details">
+            <h3>{{parent.name}} {{parent.surname}}</h3>
+            <p>Parent of {{child.name}} {{child.surname}}</p>
+            <p class="contact-info">{{parent.email}}</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content Sections -->
+    <div class="content-area">
+      <!-- Overview Section -->
+      <div *ngIf="activeSection === 'overview'" class="section overview-section">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon performance-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="stat-info">
+              <h3>{{child.overallAverage}}%</h3>
+              <p>Overall Average</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon attendance-icon">
+              <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-info">
+              <h3>{{child.attendance}}%</h3>
+              <p>Attendance Rate</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon subjects-icon">
+              <i class="fas fa-book-open"></i>
+            </div>
+            <div class="stat-info">
+              <h3>{{child.subjects.length}}</h3>
+              <p>Active Subjects</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="performance-summary">
+          <h2>Performance Summary</h2>
+          <div class="subjects-overview">
+            <div *ngFor="let subject of child.subjects" class="subject-summary">
+              <div class="subject-header">
+                <h4>{{subject.name}}</h4>
+                <span class="grade-badge">{{subject.grade}}</span>
+              </div>
+              <div class="subject-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" [style.width.%]="subject.percentage"></div>
+                </div>
+                <span class="percentage">{{subject.percentage}}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Child Profile Section -->
+      <div *ngIf="activeSection === 'child-profile'" class="section profile-section">
+        <h2>{{child.name}}'s Academic Profile</h2>
+        
+        <div class="profile-content">
+          <div class="profile-card basic-info">
+            <h3>Student Information</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Full Name:</label>
+                <span>{{child.name}} {{child.surname}}</span>
+              </div>
+              <div class="info-item">
+                <label>Grade & Class:</label>
+                <span>{{child.grade}} - {{child.class}}</span>
+              </div>
+              <div class="info-item">
+                <label>Class Teacher:</label>
+                <span>{{child.classTeacher}}</span>
+              </div>
+              <div class="info-item">
+                <label>Overall Average:</label>
+                <span class="highlight">{{child.overallAverage}}%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="subjects-detailed">
+            <h3>Subject Performance</h3>
+            <div *ngFor="let subject of child.subjects" class="subject-card">
+              <div class="subject-header">
+                <h4>{{subject.name}}</h4>
+                <div class="subject-meta">
+                  <span class="grade">{{subject.grade}}</span>
+                  <span class="percentage">{{subject.percentage}}%</span>
+                </div>
+              </div>
+              <div class="teacher-info">
+                <p>Teacher: {{subject.teacher}}</p>
+              </div>
+              <div class="topics-progress">
+                <div class="struggling-topics" *ngIf="subject.struggling.length">
+                  <h5>Areas for Improvement:</h5>
+                  <div class="topic-tags">
+                    <span *ngFor="let topic of subject.struggling" class="topic-tag struggling">
+                      {{topic}}
+                    </span>
+                  </div>
+                </div>
+                <div class="mastered-topics">
+                  <h5>Mastered Topics:</h5>
+                  <div class="topic-tags">
+                    <span *ngFor="let topic of subject.mastered" class="topic-tag mastered">
+                      {{topic}}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <button class="contact-btn" (click)="contactTeacher(subject.name)">
+                <i class="fas fa-envelope"></i>
+                Contact Teacher
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Billing Section -->
+      <div *ngIf="activeSection === 'billing'" class="section billing-section">
+        <h2>Billing & Fee Management</h2>
+        
+        <div class="billing-overview">
+          <div class="billing-card balance">
+            <div class="billing-icon">
+              <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="billing-info">
+              <h3>${{billing.currentBalance}}</h3>
+              <p>Current Balance</p>
+            </div>
+          </div>
+          
+          <div class="billing-card due-date">
+            <div class="billing-icon">
+              <i class="fas fa-calendar-times"></i>
+            </div>
+            <div class="billing-info">
+              <h3>{{billing.dueDate | date:'MMM dd'}}</h3>
+              <p>Payment Due</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="payment-actions">
+          <button class="pay-btn" (click)="payFees()">
+            <i class="fas fa-credit-card"></i>
+            Pay Now
+          </button>
+        </div>
+      </div>
+
+      <!-- Schedule Section -->
+      <div *ngIf="activeSection === 'schedule'" class="section schedule-section">
+        <h2>Today's Schedule</h2>
+        
+        <div class="schedule-list">
+          <div *ngFor="let class of schedule" class="schedule-item">
+            <div class="time-slot">
+              <span class="time">{{class.time}}</span>
+            </div>
+            <div class="class-info">
+              <h4>{{class.subject}}</h4>
+              <p>{{class.teacher}} • {{class.room}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- School Connect Section -->
+      <div *ngIf="activeSection === 'school-connect'" class="section school-connect-section">
+        <h2>School Connect</h2>
+        
+        <div class="connect-options">
+          <div class="connect-card">
+            <div class="connect-icon whatsapp-icon">
+              <i class="fab fa-whatsapp"></i>
+            </div>
+            <h3>WhatsApp Groups</h3>
+            <p>Accept invitations and join class parent groups</p>
+            <div class="group-invitations">
+              <div *ngFor="let invitation of whatsappInvitations" class="invitation-item">
+                <div class="invitation-info">
+                  <h4>{{invitation.groupName}}</h4>
+                  <p>Invited by: {{invitation.invitedBy}}</p>
+                </div>
+                <div class="invitation-actions">
+                  <button class="accept-btn" (click)="acceptInvitation(invitation.id)">
+                    <i class="fas fa-check"></i>
+                    Accept
+                  </button>
+                  <button class="decline-btn" (click)="declineInvitation(invitation.id)">
+                    <i class="fas fa-times"></i>
+                    Decline
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="connect-card">
+            <div class="connect-icon teacher-icon">
+              <i class="fas fa-chalkboard-teacher"></i>
+            </div>
+            <h3>Teacher Communication</h3>
+            <p>Connect with your child's teachers</p>
+            <div class="teacher-contacts">
+              <div *ngFor="let subject of child.subjects" class="teacher-contact">
+                <div class="teacher-info">
+                  <h4>{{subject.name}}</h4>
+                  <p>{{subject.teacher}}</p>
+                </div>
+                <div class="contact-actions">
+                  <button class="whatsapp-btn" (click)="contactTeacherWhatsApp(subject.teacher)">
+                    <i class="fab fa-whatsapp"></i>
+                    WhatsApp
+                  </button>
+                  <button class="email-btn" (click)="contactTeacherEmail(subject.teacher)">
+                    <i class="fas fa-envelope"></i>
+                    Email
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="connect-card">
+            <div class="connect-icon admin-icon">
+              <i class="fas fa-user-tie"></i>
+            </div>
+            <h3>School Administration</h3>
+            <p>Contact school admin for general inquiries</p>
+            <button class="admin-email-btn" (click)="emailSchoolAdmin()">
+              <i class="fas fa-paper-plane"></i>
+              Email School Admin
+            </button>
+          </div>
+        </div>
+        
+        <div class="announcements-section">
+          <h3>School Announcements</h3>
+          <div class="announcements-list">
+            <div *ngFor="let announcement of schoolAnnouncements" class="announcement-item" [ngClass]="announcement.priority">
+              <div class="announcement-header">
+                <h4>{{announcement.title}}</h4>
+                <span class="announcement-date">{{announcement.date | date:'MMM dd, yyyy'}}</span>
+              </div>
+              <p class="announcement-content">{{announcement.content}}</p>
+              <div class="announcement-meta">
+                <span class="sender">From: {{announcement.sender}}</span>
+                <span class="priority-badge" [ngClass]="announcement.priority">{{announcement.priority | titlecase}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mail Section -->
+      <div *ngIf="activeSection === 'mail'" class="section mail-section">
+        <div *ngIf="!selectedEmail" class="mail-list-view">
+          <h2>Mail Inbox</h2>
+          <div class="mail-list">
+            <div *ngFor="let email of emails" class="mail-item" [class.unread]="!email.read" (click)="openEmail(email.id)">
+              <div class="mail-sender">
+                <strong>{{email.sender}}</strong>
+              </div>
+              <div class="mail-subject">
+                {{email.subject}}
+              </div>
+              <div class="mail-preview">
+                {{email.preview}}
+              </div>
+              <div class="mail-date">
+                {{email.date | date:'MMM dd, HH:mm'}}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="selectedEmail" class="mail-detail-view">
+          <div class="mail-header">
+            <button class="back-btn" (click)="backToMailList()">
+              <i class="fas fa-arrow-left"></i>
+              Back to Inbox
+            </button>
+          </div>
+          
+          <div class="mail-content">
+            <div class="mail-info">
+              <h3>{{selectedEmail.subject}}</h3>
+              <div class="mail-meta">
+                <span class="sender">From: {{selectedEmail.sender}}</span>
+                <span class="date">{{selectedEmail.date | date:'MMM dd, yyyy HH:mm'}}</span>
+              </div>
+            </div>
+            
+            <div class="mail-body">
+              <p>{{selectedEmail.content}}</p>
+            </div>
+            
+            <div class="reply-section">
+              <h4>Reply</h4>
+              <textarea [(ngModel)]="replyMessage" placeholder="Type your reply..."></textarea>
+              <button class="reply-btn" (click)="sendReply()">
+                <i class="fas fa-paper-plane"></i>
+                Send Reply
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Guardian Assistant Chatbot -->
+  <div class="chatbot-container">
+    <div class="chatbot-header" (click)="toggleChatbot()">
+      <i class="fas fa-robot"></i>
+      <span>Guardian Assistant</span>
+      <i class="fas fa-chevron-down" [class.rotate]="isChatbotOpen"></i>
+    </div>
+    
+    <div class="chatbot-content" [class.open]="isChatbotOpen">
+      <div class="chat-messages">
+        <div *ngFor="let message of chatMessages" class="message" [ngClass]="message.type">
+          <div class="message-content">
+            <p>{{message.text}}</p>
+            <small>{{message.timestamp | date:'HH:mm'}}</small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="chat-input">
+        <input type="text" [(ngModel)]="newMessage" placeholder="Ask about Emma's progress..." (keyup.enter)="sendMessage()">
+        <button (click)="sendMessage()">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

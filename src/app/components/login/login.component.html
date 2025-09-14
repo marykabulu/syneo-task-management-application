@@ -8,6 +8,17 @@
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
       <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Login As</mat-label>
+        <mat-select formControlName="userRole" required>
+          <mat-option value="student">Student</mat-option>
+          <mat-option value="teacher">Teacher</mat-option>
+          <mat-option value="parent">Parent</mat-option>
+          <mat-option value="admin">Admin</mat-option>
+        </mat-select>
+        <mat-error *ngIf="loginForm.get('userRole')?.hasError('required')">Please select a role</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
         <mat-label>Email</mat-label>
         <input matInput formControlName="email" placeholder="name@example.com" type="email" required>
         <mat-error *ngIf="loginForm.get('email')?.hasError('required')">Email is required</mat-error>

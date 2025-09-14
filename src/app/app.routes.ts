@@ -5,6 +5,9 @@ import { ForgotPasswordComponent } from './components/forgot-password/forgot-pas
 import { VerifyCodeComponent } from './components/verify-code/verify-code.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { TeacherComponent } from './components/teacher/teacher.component';
+import { ParentComponent } from './components/parent/parent.component';
+import { AdminComponent } from './components/admin/admin.component';
 import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -14,5 +17,8 @@ export const routes: Routes = [
   { path: 'verify-code', component: VerifyCodeComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
+  { path: 'teacher', component: TeacherComponent },
+  { path: 'parent', component: ParentComponent },
+  { path: 'admin', component: AdminComponent },
   { path: '**', redirectTo: '' }
 ];

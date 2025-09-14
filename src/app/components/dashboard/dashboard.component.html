@@ -28,10 +28,10 @@
         <span>Syllabus</span>
         <i class="fas fa-star favorite-star" [class.favorited]="favorites['syllabus']" (click)="toggleFavorite('syllabus', $event)"></i>
       </div>
-      <div class="nav-item" [class.active]="activeSection === 'progress'" (click)="setActiveSection('progress')">
-        <i class="fas fa-chart-line"></i>
-        <span>Progress</span>
-        <i class="fas fa-star favorite-star" [class.favorited]="favorites['progress']" (click)="toggleFavorite('progress', $event)"></i>
+      <div class="nav-item" [class.active]="activeSection === 'stationary'" (click)="setActiveSection('stationary')">
+        <i class="fas fa-list-ul"></i>
+        <span>My Stationary</span>
+        <i class="fas fa-star favorite-star" [class.favorited]="favorites['stationary']" (click)="toggleFavorite('stationary', $event)"></i>
       </div>
       <div class="nav-item" [class.active]="activeSection === 'homework'" (click)="setActiveSection('homework')">
         <i class="fas fa-tasks"></i>
@@ -254,28 +254,24 @@
         </div>
       </div>
 
-      <!-- Progress Section -->
-      <div *ngIf="activeSection === 'progress'" class="section progress-section">
-        <h2>Learning Progress & Mastery</h2>
-        <div class="mastery-grid">
-          <div *ngFor="let subject of subjects" class="mastery-card">
-            <div class="mastery-header">
-              <h3>{{subject.name}}</h3>
-              <span class="mastery-level" [style.color]="getMasteryColor(subject.masteryLevel)">
-                {{subject.masteryLevel}}
-              </span>
-            </div>
-            <div class="circular-progress">
-              <svg class="progress-ring" width="120" height="120">
-                <circle class="progress-ring-circle" cx="60" cy="60" r="50" 
-                        [style.stroke-dashoffset]="314 - (314 * subject.progress) / 100"></circle>
-              </svg>
-              <div class="progress-text">{{subject.progress}}%</div>
-            </div>
-            <div class="next-test">
-              <p>Next Test: {{subject.nextTest | date:'MMM dd'}}</p>
-            </div>
+      <!-- My Stationary Section -->
+      <div *ngIf="activeSection === 'stationary'" class="section stationary-section">
+        <h2>My Stationary Checklist</h2>
+        <div class="stationary-checklist">
+          <div *ngFor="let item of stationaryItems; let i = index" class="stationary-item">
+            <label class="checkbox-container">
+              <input type="checkbox" [(ngModel)]="item.have" (change)="updateStationaryStatus()">
+              <span class="checkmark"></span>
+              <span class="item-name" [class.missing]="!item.have">{{item.name}}</span>
+            </label>
           </div>
+        </div>
+        <div class="stationary-summary">
+          <p>Missing Items: {{getMissingItems().length}}</p>
+          <button class="update-btn" (click)="saveStationaryStatus()">
+            <i class="fas fa-save"></i>
+            Update Status
+          </button>
         </div>
       </div>
 

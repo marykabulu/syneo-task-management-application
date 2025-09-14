@@ -1,0 +1,499 @@
+<div class="dashboard-container">
+  <!-- Sidebar Toggle Button -->
+  <button class="sidebar-toggle" (click)="toggleSidebar()" [class.collapsed]="isSidebarCollapsed">
+    <i class="fas fa-bars"></i>
+  </button>
+  
+  <!-- Sidebar Navigation -->
+  <nav class="sidebar" [class.collapsed]="isSidebarCollapsed">
+    <div class="sidebar-header">
+      <div class="logo">
+        <div class="logo-icon">
+          <i class="fas fa-chalkboard-teacher"></i>
+        </div>
+        <span class="logo-text">TeacherHub</span>
+      </div>
+    </div>
+    
+    <div class="nav-menu">
+      <div class="nav-item" [class.active]="activeSection === 'overview'" (click)="setActiveSection('overview')">
+        <div class="nav-content">
+          <i class="fas fa-home"></i>
+          <span>Overview</span>
+        </div>
+        <i class="fas fa-star favorite-star" [class.favorited]="favorites['overview']" (click)="toggleFavorite('overview', $event)"></i>
+      </div>
+      <div class="nav-item" [class.active]="activeSection === 'classes'" (click)="setActiveSection('classes')">
+        <div class="nav-content">
+          <i class="fas fa-users"></i>
+          <span>My Classes</span>
+        </div>
+        <i class="fas fa-star favorite-star" [class.favorited]="favorites['classes']" (click)="toggleFavorite('classes', $event)"></i>
+      </div>
+      <div class="nav-item" [class.active]="activeSection === 'upload-files'" (click)="setActiveSection('upload-files')">
+        <div class="nav-content">
+          <i class="fas fa-upload"></i>
+          <span>Upload Course Files</span>
+        </div>
+        <i class="fas fa-star favorite-star" [class.favorited]="favorites['upload-files']" (click)="toggleFavorite('upload-files', $event)"></i>
+      </div>
+      <div class="nav-item" [class.active]="activeSection === 'mock-exam'" (click)="setActiveSection('mock-exam')">
+        <div class="nav-content">
+          <i class="fas fa-file-alt"></i>
+          <span>Create Mock Exam</span>
+        </div>
+        <i class="fas fa-star favorite-star" [class.favorited]="favorites['mock-exam']" (click)="toggleFavorite('mock-exam', $event)"></i>
+      </div>
+      <div class="nav-item" [class.active]="activeSection === 'homework'" (click)="setActiveSection('homework')">
+        <div class="nav-content">
+          <i class="fas fa-tasks"></i>
+          <span>Add Homework</span>
+        </div>
+        <i class="fas fa-star favorite-star" [class.favorited]="favorites['homework']" (click)="toggleFavorite('homework', $event)"></i>
+      </div>
+      <div class="nav-item" [class.active]="activeSection === 'add-assignment'" (click)="setActiveSection('add-assignment')">
+        <div class="nav-content">
+          <i class="fas fa-plus-circle"></i>
+          <span>Add Assignment</span>
+        </div>
+        <i class="fas fa-star favorite-star" [class.favorited]="favorites['add-assignment']" (click)="toggleFavorite('add-assignment', $event)"></i>
+      </div>
+      <div class="nav-item" [class.active]="activeSection === 'ai-chatbot'" (click)="setActiveSection('ai-chatbot')">
+        <div class="nav-content">
+          <i class="fas fa-robot"></i>
+          <span>AI Educator Portal</span>
+        </div>
+        <i class="fas fa-star favorite-star" [class.favorited]="favorites['ai-chatbot']" (click)="toggleFavorite('ai-chatbot', $event)"></i>
+      </div>
+      <div class="nav-item" [class.active]="activeSection === 'stationary-list'" (click)="setActiveSection('stationary-list')">
+        <div class="nav-content">
+          <i class="fas fa-list-ul"></i>
+          <span>Stationary List</span>
+        </div>
+        <i class="fas fa-star favorite-star" [class.favorited]="favorites['stationary-list']" (click)="toggleFavorite('stationary-list', $event)"></i>
+      </div>
+      <div class="nav-item" [class.active]="activeSection === 'student-insights'" (click)="setActiveSection('student-insights')">
+        <div class="nav-content">
+          <i class="fas fa-chart-line"></i>
+          <span>Student Insights</span>
+        </div>
+        <i class="fas fa-star favorite-star" [class.favorited]="favorites['student-insights']" (click)="toggleFavorite('student-insights', $event)"></i>
+      </div>
+      <div class="nav-item" [class.active]="activeSection === 'parent-connect'" (click)="setActiveSection('parent-connect')">
+        <div class="nav-content">
+          <i class="fas fa-users-cog"></i>
+          <span>Parent Connect</span>
+        </div>
+        <i class="fas fa-star favorite-star" [class.favorited]="favorites['parent-connect']" (click)="toggleFavorite('parent-connect', $event)"></i>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content" [class.expanded]="isSidebarCollapsed">
+    <!-- Header -->
+    <header class="header">
+      <div class="welcome-section">
+        <h1>Welcome back, {{teacher.name}}!</h1>
+        <p>Manage your classes and student progress</p>
+      </div>
+      
+      <div class="teacher-profile">
+        <div class="teacher-info">
+          <div class="teacher-details">
+            <h3>{{teacher.name}} {{teacher.surname}}</h3>
+            <p>{{teacher.department}} Department</p>
+            <p class="teacher-id">ID: {{teacher.id}}</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content Sections -->
+    <div class="content-area">
+      <!-- Overview Section -->
+      <div *ngIf="activeSection === 'overview'" class="section overview-section">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon classes-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-info">
+              <h3>{{teacher.totalClasses}}</h3>
+              <p>Active Classes</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon students-icon">
+              <i class="fas fa-user-graduate"></i>
+            </div>
+            <div class="stat-info">
+              <h3>{{teacher.totalStudents}}</h3>
+              <p>Total Students</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon assignments-icon">
+              <i class="fas fa-tasks"></i>
+            </div>
+            <div class="stat-info">
+              <h3>{{teacher.pendingGrading}}</h3>
+              <p>Pending Grading</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <h2>Quick Actions</h2>
+          <div class="action-buttons">
+            <button *ngFor="let item of getFavoriteItems()" class="action-btn primary" (click)="setActiveSection(item.section)">
+              <i class="fas" [ngClass]="item.icon"></i>
+              {{item.name}}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- My Classes Section -->
+      <div *ngIf="activeSection === 'classes'" class="section classes-section">
+        <h2>My Classes</h2>
+        <div class="classes-grid">
+          <div *ngFor="let class of classes" class="class-card">
+            <div class="class-header">
+              <h3>{{class.name}}</h3>
+              <span class="class-grade">{{class.grade}}</span>
+            </div>
+            <div class="class-actions">
+              <button class="action-btn" (click)="viewSyllabus(class.id)">
+                <i class="fas fa-book"></i>
+                My Syllabus
+              </button>
+              <button class="action-btn" (click)="viewAttendance(class.id)">
+                <i class="fas fa-clipboard-list"></i>
+                Class Register
+              </button>
+              <button class="action-btn" (click)="viewHomework(class.id)">
+                <i class="fas fa-file-upload"></i>
+                Student Homework
+              </button>
+              <button class="action-btn" (click)="viewAssignments(class.id)">
+                <i class="fas fa-clipboard-check"></i>
+                Assignments
+              </button>
+              <button class="action-btn" (click)="openAIPortal(class.id)">
+                <i class="fas fa-robot"></i>
+                AI Portal
+              </button>
+              <button class="action-btn" (click)="classAnnouncements(class.id)">
+                <i class="fas fa-bullhorn"></i>
+                Announcements
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Educator Portal Section -->
+      <div *ngIf="activeSection === 'ai-chatbot'" class="section ai-portal-section">
+        <h2>AI Educator Portal Chatbot</h2>
+        <div class="ai-features-grid">
+          <div class="ai-feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-question-circle"></i>
+            </div>
+            <h3>Generate Quizzes</h3>
+            <p>AI-powered quiz generation for any topic</p>
+            <button class="feature-btn" (click)="generateQuiz()">
+              <i class="fas fa-magic"></i>
+              Create Quiz
+            </button>
+          </div>
+          
+          <div class="ai-feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-clipboard-check"></i>
+            </div>
+            <h3>Create Rubrics</h3>
+            <p>Automated rubric creation for assessments</p>
+            <button class="feature-btn" (click)="generateRubric()">
+              <i class="fas fa-magic"></i>
+              Create Rubric
+            </button>
+          </div>
+          
+          <div class="ai-feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-chalkboard"></i>
+            </div>
+            <h3>Lesson Plans</h3>
+            <p>Generate comprehensive lesson plans</p>
+            <button class="feature-btn" (click)="generateLessonPlan()">
+              <i class="fas fa-magic"></i>
+              Create Plan
+            </button>
+          </div>
+          
+          <div class="ai-feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3>At-Risk Students</h3>
+            <p>AI insights on struggling students</p>
+            <button class="feature-btn" (click)="analyzeStudents()">
+              <i class="fas fa-chart-line"></i>
+              View Insights
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Parent Connect Section -->
+      <div *ngIf="activeSection === 'parent-connect'" class="section parent-connect-section">
+        <h2>Parent Connect</h2>
+        
+        <div class="connect-options">
+          <div class="connect-card">
+            <div class="connect-icon email-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <h3>Email Communication</h3>
+            <p>Send emails to parents individually or in groups</p>
+            <button class="connect-btn" (click)="openEmailTool()">
+              <i class="fas fa-paper-plane"></i>
+              Send Email
+            </button>
+          </div>
+          
+          <div class="connect-card">
+            <div class="connect-icon whatsapp-icon">
+              <i class="fab fa-whatsapp"></i>
+            </div>
+            <h3>WhatsApp Connect</h3>
+            <p>Connect with parents via WhatsApp messaging</p>
+            <button class="connect-btn whatsapp" (click)="openWhatsApp()">
+              <i class="fab fa-whatsapp"></i>
+              Open WhatsApp
+            </button>
+          </div>
+        </div>
+        
+        <div class="class-groups">
+          <h3>WhatsApp Parent Groups by Class</h3>
+          <div class="groups-grid">
+            <div *ngFor="let class of classes" class="group-card">
+              <div class="group-header">
+                <h4>{{class.name}} Parents</h4>
+                <span class="parent-count">{{class.parentCount || 20}} Parents</span>
+              </div>
+              <div class="group-actions">
+                <button class="group-btn" (click)="addParent(class.id)">
+                  <i class="fas fa-user-plus"></i>
+                  Add Parent
+                </button>
+                <button class="group-btn secondary" (click)="manageGroup(class.id)">
+                  <i class="fas fa-cog"></i>
+                  Manage
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stationary List Section -->
+      <div *ngIf="activeSection === 'stationary-list'" class="section stationary-section">
+        <h2>Stationary List by Grade</h2>
+        
+        <div class="grade-selector">
+          <label>Select Grade:</label>
+          <select [(ngModel)]="selectedGrade" (change)="loadStationaryList()">
+            <option value="">Choose Grade</option>
+            <option value="Grade 10">Grade 10</option>
+            <option value="Grade 11">Grade 11</option>
+            <option value="Grade 12">Grade 12</option>
+          </select>
+        </div>
+        
+        <div *ngIf="selectedGrade" class="stationary-form">
+          <div class="add-item">
+            <input type="text" [(ngModel)]="newStationaryItem" placeholder="Add stationary item...">
+            <button class="add-btn" (click)="addStationaryItem()">
+              <i class="fas fa-plus"></i>
+              Add Item
+            </button>
+          </div>
+          
+          <div class="stationary-list">
+            <h3>{{selectedGrade}} Stationary List</h3>
+            <div *ngFor="let item of currentStationaryList; let i = index" class="stationary-item">
+              <span>{{item}}</span>
+              <button class="remove-btn" (click)="removeStationaryItem(i)">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+          
+          <button class="save-btn" (click)="saveStationaryList()">
+            <i class="fas fa-save"></i>
+            Save & Send to Students
+          </button>
+        </div>
+      </div>
+
+      <!-- Student Insights Section -->
+      <div *ngIf="activeSection === 'student-insights'" class="section insights-section">
+        <div *ngIf="!selectedClass && !selectedStudent">
+          <h2>Student Insights</h2>
+          <div class="classes-grid">
+            <div *ngFor="let class of classes" class="class-card" (click)="selectClassForInsights(class.id)">
+              <div class="class-header">
+                <h3>{{class.name}}</h3>
+                <span class="class-grade">{{class.grade}}</span>
+              </div>
+              <p>{{class.students}} Students</p>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="selectedClass && !selectedStudent">
+          <div class="insights-header">
+            <button class="back-btn" (click)="backToClasses()">
+              <i class="fas fa-arrow-left"></i>
+              Back to Classes
+            </button>
+            <h2>{{getClassName(selectedClass)}} - Students</h2>
+          </div>
+          <div class="students-grid">
+            <div *ngFor="let student of getClassStudents(selectedClass)" class="student-card" (click)="selectStudent(student.id)">
+              <div class="student-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+              <h4>{{student.name}} {{student.surname}}</h4>
+              <p>Student ID: {{student.id}}</p>
+              <span class="attendance-status" [class.present]="student.present" [class.absent]="!student.present">
+                {{student.present ? 'Present' : 'Absent'}}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="selectedStudent" class="student-profile">
+          <div class="profile-header">
+            <button class="back-btn" (click)="backToStudents()">
+              <i class="fas fa-arrow-left"></i>
+              Back to Students
+            </button>
+            <h2>{{getStudentName(selectedStudent)}} - Profile</h2>
+          </div>
+          
+          <div class="profile-content">
+            <div class="profile-card basic-info">
+              <h3>Basic Information</h3>
+              <div class="info-grid">
+                <div class="info-item">
+                  <label>Student ID:</label>
+                  <span>{{getStudentData(selectedStudent)?.id}}</span>
+                </div>
+                <div class="info-item">
+                  <label>Grade Rank:</label>
+                  <span>{{getStudentData(selectedStudent)?.gradeRank}}</span>
+                </div>
+                <div class="info-item">
+                  <label>Class Teacher:</label>
+                  <span>{{getStudentData(selectedStudent)?.classTeacher}}</span>
+                </div>
+                <div class="info-item">
+                  <label>Joined School:</label>
+                  <span>{{getStudentData(selectedStudent)?.joinDate | date:'MMM yyyy'}}</span>
+                </div>
+                <div class="info-item">
+                  <label>Days Absent:</label>
+                  <span>{{getStudentData(selectedStudent)?.daysAbsent}}</span>
+                </div>
+                <div class="info-item">
+                  <label>Disciplinary Cases:</label>
+                  <span [class.warning]="(getStudentData(selectedStudent)?.disciplinaryCases || 0) > 0">
+                    {{getStudentData(selectedStudent)?.disciplinaryCases || 0}}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="profile-card academic-performance">
+              <h3>Academic Performance</h3>
+              <div class="marks-grid">
+                <div class="mark-item">
+                  <label>Exam Mark:</label>
+                  <span>{{getStudentData(selectedStudent)?.examMark}}%</span>
+                </div>
+                <div class="mark-item">
+                  <label>Assignment Average:</label>
+                  <span>{{getStudentData(selectedStudent)?.assignmentAverage}}%</span>
+                </div>
+                <div class="mark-item">
+                  <label>Year Mark:</label>
+                  <span>{{getStudentData(selectedStudent)?.yearMark}}%</span>
+                </div>
+                <div class="mark-item">
+                  <label>Final Mark:</label>
+                  <span class="final-mark">{{getStudentData(selectedStudent)?.finalMark}}%</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="profile-card topics-progress">
+              <h3>Topics Progress</h3>
+              <div class="topics-section">
+                <div class="struggling-topics">
+                  <h4>Struggling With:</h4>
+                  <div class="topic-tags">
+                    <span *ngFor="let topic of getStudentData(selectedStudent)?.strugglingTopics" class="topic-tag struggling">
+                      {{topic}}
+                    </span>
+                  </div>
+                </div>
+                <div class="mastered-topics">
+                  <h4>Mastered:</h4>
+                  <div class="topic-tags">
+                    <span *ngFor="let topic of getStudentData(selectedStudent)?.masteredTopics" class="topic-tag mastered">
+                      {{topic}}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Teacher Assistant Chatbot -->
+  <div class="chatbot-container">
+    <div class="chatbot-header" (click)="toggleChatbot()">
+      <i class="fas fa-robot"></i>
+      <span>Teacher Assistant</span>
+      <i class="fas fa-chevron-down" [class.rotate]="isChatbotOpen"></i>
+    </div>
+    
+    <div class="chatbot-content" [class.open]="isChatbotOpen">
+      <div class="chat-messages">
+        <div *ngFor="let message of chatMessages" class="message" [ngClass]="message.type">
+          <div class="message-content">
+            <p>{{message.text}}</p>
+            <small>{{message.timestamp | date:'HH:mm'}}</small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="chat-input">
+        <input type="text" [(ngModel)]="newMessage" placeholder="Ask about your dashboard..." (keyup.enter)="sendMessage()">
+        <button (click)="sendMessage()">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
