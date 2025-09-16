@@ -1,0 +1,22 @@
+# Lambda backend (already deployed to AWS)
+src/app/services/Lambda-back-end/
+
+# Build cache
+.angular/
+node_modules/
+
+# Development files
+*.log
+.env*
+.vscode/
+.idea/
+
+# Test files
+*.spec.ts
+karma.conf.js
+src/test.ts
+
+# Documentation
+README.md
+LICENSE
+Desktop.lnk
